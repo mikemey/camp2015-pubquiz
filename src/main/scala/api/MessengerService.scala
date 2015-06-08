@@ -10,7 +10,7 @@ class MessengerService(messenger: ActorRef)(implicit executionContext: Execution
 
   import MessengerActor._
 
-  implicit val sendMessageFormat = jsonFormat2(SendMessage)
+  implicit val sendMessageFormat = jsonFormat3(SendMessage)
 
    val route =
      path("message") {

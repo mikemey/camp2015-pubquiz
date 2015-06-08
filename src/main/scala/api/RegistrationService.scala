@@ -35,21 +35,6 @@ class RegistrationService(registration: ActorRef)(implicit executionContext: Exe
       post {
         handleWith { ru: Register => (registration ? ru).mapTo[Either[NotRegistered.type, Registered.type]] }
       }
-    } ~
-    path("register" / "image") {
-      post {
-        handleWith { data: MultipartFormData =>
-          data.fields.get("files[]") match {
-            case Some(imageEntity) =>
-              val size = imageEntity.entity.buffer.length
-              println(s"Uploaded $size")
-              ImageUploaded(size)
-            case None =>
-              println("No files")
-              ImageUploaded(0)
-          }
-        }
-      }
     }
 
 }
