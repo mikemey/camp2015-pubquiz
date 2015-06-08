@@ -6,7 +6,7 @@ import com.typesafe.config.ConfigFactory
 object PubQuizClient {
 
   def main(args: Array[String]): Unit = {
-    val system = ActorSystem("client", ConfigFactory.load("client-application"))
+    val system = ActorSystem("client", ConfigFactory.load("application"))
     val clientActor: ActorRef = system.actorOf(Props[PubQuizClient], "client")
     clientActor ! "send"
   }
