@@ -11,7 +11,7 @@ class PubQuizResource(messenger: ActorRef)(implicit executionContext: ExecutionC
 
   import ClusterBroadcaster._
 
-  implicit val answerFormat = jsonFormat2(Answer)
+  implicit val answerFormat = jsonFormat2(Choice)
   implicit val questionFormat = jsonFormat2(BroadcastQuestion)
 
   val route =
