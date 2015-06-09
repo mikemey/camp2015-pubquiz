@@ -17,5 +17,6 @@ object Rest extends App {
 
   IO(Http)(system) ! Http.Bind(rootService, "0.0.0.0", port = 8080)
 
+  ciccio ! "System is started! Tell Julio!"
   sys.addShutdownHook(system.terminate())
 }
