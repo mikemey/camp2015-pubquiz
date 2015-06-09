@@ -34,13 +34,14 @@ class ClusterBroadcaster extends Actor with ActorLogging {
     case BroadcastQuestion(question, choices) =>
 
       val correctAnswer = choices.find(_.isCorrect).getOrElse(throw new RuntimeException("There must be a correct choice")).value
-      val activeMembers = cluster.state.getMembers.asScala
+      val selfAddress = this.self.path.address
+      val activeMembers = cluster.state.getMembers.asScala.filterNot(_.address == selfAddress)
 
       val questionManager = context.actorOf(Props(classOf[QuestionManager], correctAnswer, DefaultQuestionExpirationInMinutes,
         activeMembers), s"question-manager-${(Math.random() * 100).toInt}")
 
       activeMembers.foreach { member =>
-        val memberRef = context.actorSelection(s"${member.address.toString}/user/question-receiver")
+        val memberRef = context.actorSelection(s"${member.address.toString}/user/julio")
         memberRef ! Question(question, choices.map(_.value), questionManager)
       }
     case _ => log.warning(s"Unknown message")
