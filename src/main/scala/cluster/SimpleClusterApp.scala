@@ -11,7 +11,7 @@ object SimpleClusterApp {
     // Create an Akka system
     val system = ActorSystem("ClusterSystem", config)
     // Create an actor that handles cluster domain events
-    system.actorOf(Props[SimpleClusterListener], name = "clusterListener")
+    system.actorOf(Props[ClusterBroadcaster], name = "clusterListener")
   }
 }
 
