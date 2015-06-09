@@ -1,14 +1,14 @@
 $( document ).ready(function() {
     $('#answerForm').hide();
 
-//    var tid = setInterval(pollQuestion, 4000);
-//    function pollQuestion() {
-//      $.get("/quiz/question", function( data ) {
-//        if(data.question) {
-//           swapForms(data);
-//        }
-//      });
-//    }
+    var tid = setInterval(pollQuestion, 4000);
+    function pollQuestion() {
+      $.get("/quiz/question", function( data ) {
+        if(data.question) {
+           swapForms(data);
+        }
+      });
+    }
 
     function abortTimer() { // to be called when you want to stop the timer
       clearInterval(tid);
