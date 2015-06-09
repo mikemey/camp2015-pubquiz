@@ -1,6 +1,7 @@
 package core
 
 import akka.actor.{Props, ActorSystem}
+import cluster.ClusterBroadcaster
 
 /**
  * Core is type containing the ``system: ActorSystem`` member. This enables us to use it in our
@@ -37,7 +38,7 @@ trait BootedCore extends Core {
 trait CoreActors {
   this: Core =>
 
-  val registration = system.actorOf(Props[RegistrationActor])
+  val clusterBroadcaster = system.actorOf(Props[ClusterBroadcaster])
   val messenger    = system.actorOf(Props[MessengerActor])
 
 }
