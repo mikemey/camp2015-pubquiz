@@ -1,7 +1,8 @@
 package core
 
-import akka.actor.{Props, ActorSystem}
+import akka.actor.{ActorSystem, Props}
 import cluster.ClusterBroadcaster
+import com.typesafe.config.ConfigFactory
 
 /**
  * Core is type containing the ``system: ActorSystem`` member. This enables us to use it in our
@@ -22,12 +23,15 @@ trait BootedCore extends Core {
   /**
    * Construct the ActorSystem we will use in our application
    */
-  implicit lazy val system = ActorSystem("akka-spray")
+
+  // Create an Akka system
+  val config = ConfigFactory.load()
+  implicit lazy val system = ActorSystem("ClusterSystem", config)
 
   /**
    * Ensure that the constructed ActorSystem is shut down when the JVM shuts down
    */
-  sys.addShutdownHook(system.shutdown())
+  sys.addShutdownHook(system.terminate())
 
 }
 
@@ -39,6 +43,5 @@ trait CoreActors {
   this: Core =>
 
   val clusterBroadcaster = system.actorOf(Props[ClusterBroadcaster])
-  val messenger    = system.actorOf(Props[MessengerActor])
 
 }

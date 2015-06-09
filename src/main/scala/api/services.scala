@@ -80,11 +80,8 @@ class RoutedHttpService(route: Route) extends Actor with HttpService with SprayA
     }
   }
 
-
   def receive: Receive =
     runRoute(route)(handler, RejectionHandler.Default, context, RoutingSettings.default, LoggingContext.fromActorRefFactory)
-
-
 }
 
 /**

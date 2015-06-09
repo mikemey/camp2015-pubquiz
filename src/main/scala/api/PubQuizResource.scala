@@ -6,7 +6,7 @@ import spray.routing.Directives
 
 import scala.concurrent.ExecutionContext
 
-class PubQuizResource(messenger: ActorRef)(implicit executionContext: ExecutionContext)
+class PubQuizResource(clusterBroadcaster: ActorRef)(implicit executionContext: ExecutionContext)
   extends Directives with DefaultJsonFormats {
 
   import ClusterBroadcaster._
@@ -15,9 +15,14 @@ class PubQuizResource(messenger: ActorRef)(implicit executionContext: ExecutionC
   implicit val questionFormat = jsonFormat2(BroadcastQuestion)
 
   val route =
-    path("message") {
+    path("question") {
       post {
-        handleWith { sm: BroadcastQuestion => messenger ! sm; "{}" }
+        handleWith {
+          question: BroadcastQuestion =>
+            println("received question: " + question)
+            clusterBroadcaster ! question
+            "{ 'result': 'Question posted.'}"
+        }
       }
     }
 

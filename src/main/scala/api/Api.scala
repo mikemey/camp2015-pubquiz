@@ -1,7 +1,7 @@
 package api
 
-import core.{CoreActors, Core}
 import akka.actor.Props
+import core.{Core, CoreActors}
 import spray.routing.RouteConcatenation
 
 /**
@@ -16,9 +16,7 @@ trait Api extends RouteConcatenation {
   private implicit val _ = system.dispatcher
 
   val routes =
-//    new IndexResource().route ~
-    new PubQuizResource(clusterBroadcaster).route ~
-    new PubQuizResource(messenger).route
+    new PubQuizResource(clusterBroadcaster).route
 
   val rootService = system.actorOf(Props(new RoutedHttpService(routes)))
 
