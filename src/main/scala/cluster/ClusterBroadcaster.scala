@@ -38,7 +38,7 @@ class ClusterBroadcaster extends Actor with ActorLogging {
     case BroadcastQuestion(question, choices) =>
 
       val correctAnswer = choices.find(_.isCorrect).getOrElse(throw new RuntimeException("There must be a correct choice")).value
-      val selfAddress = this.self.path.address
+      val selfAddress = cluster.selfAddress
       val activeMembers = cluster.state.getMembers.asScala.filterNot(_.address == selfAddress)
 
       val questionManager = context.actorOf(Props(classOf[QuestionManager], question, correctAnswer, DefaultQuestionExpirationInMinutes,

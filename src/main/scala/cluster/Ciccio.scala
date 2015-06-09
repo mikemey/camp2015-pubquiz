@@ -1,10 +1,12 @@
 package cluster
 
 import akka.actor.{Actor, ActorLogging}
+import akka.cluster.Cluster
 import cluster.ClusterBroadcaster._
 
 class Ciccio extends Actor with ActorLogging {
 
+  val cluster = Cluster(context.system)
   var results: Results = null
 
   override def receive: Receive = {
@@ -17,8 +19,7 @@ class Ciccio extends Actor with ActorLogging {
 
     case "System is started! Tell Julio!" =>
       log.info("Julio tiene que lavarse")
-      val julio = context.actorSelection("/user/julio")
-      julio ! "Lavate JULIO!"
+      context.actorSelection("/user/julio") ! "Lavate JULIO!"
 
     case _ => log.warning("Ciccio - Unknown message")
   }

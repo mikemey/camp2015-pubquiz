@@ -1,15 +1,18 @@
 package api
 
-import akka.actor.{Actor, Props}
-import cluster.{Julio, ClusterBroadcaster}
+import akka.actor.{ActorContext, Actor, Props}
+import cluster.{Ciccio, Julio, ClusterBroadcaster}
 import spray.routing._
 
 class RoutedHttpService extends Actor with HttpService {
 
-  implicit def actorRefFactory = context
+  implicit def actorRefFactory: ActorContext = context
 
-  val clusterBroadcaster = context.actorOf(Props[ClusterBroadcaster])
-  val julio = context.actorOf(Props[Julio])
+  val clusterBroadcaster = context.system.actorOf(Props[ClusterBroadcaster], "clusterBroadcaster")
+  val ciccio = context.system.actorOf(Props[Ciccio], "ciccio")
+  val julio = context.system.actorOf(Props[Julio], "julio")
+
+  ciccio ! "System is started! Tell Julio!"
 
   def receive: Receive =
     runRoute(new PubQuizResource(clusterBroadcaster, julio).route)
