@@ -33,6 +33,6 @@ class ClusterBroadcaster extends Actor with ActorLogging {
   }
 }
 
-case class BroadcastQuestion(question: String, choices: Seq[Answer])
+case class BroadcastQuestion(question: String, choices: Seq[Choice])
 
-case class Answer(answer: String, isCorrect: Boolean = false)
+case class Choice(value: String, isCorrect: Boolean = false)
