@@ -12,6 +12,7 @@ libraryDependencies ++= Seq(
   "com.typesafe.akka"      %% "akka-actor"         % "2.4-M1",
   "com.typesafe.akka"      %% "akka-slf4j"         % "2.4-M1",
   "com.typesafe.akka"      %% "akka-remote"        % "2.4-M1",
+  "com.typesafe.akka"      %% "akka-cluster"       % "2.4-M1",
   "ch.qos.logback"          % "logback-classic"    % "1.0.13",
   "io.spray"               %% "spray-can"          % "1.3.3",
   "io.spray"               %% "spray-routing"      % "1.3.3",

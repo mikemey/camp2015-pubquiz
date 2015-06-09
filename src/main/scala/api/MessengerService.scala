@@ -13,6 +13,11 @@ class MessengerService(messenger: ActorRef)(implicit executionContext: Execution
   implicit val sendMessageFormat = jsonFormat3(SendMessage)
 
    val route =
+     path("") {
+       get {
+         getFromFile("src/main/resources/html/index.html")
+       }
+     } ~
      path("message") {
        post {
          handleWith { sm: SendMessage => messenger ! sm; "{}" }

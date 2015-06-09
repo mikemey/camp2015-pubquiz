@@ -16,6 +16,7 @@ trait Api extends RouteConcatenation {
   private implicit val _ = system.dispatcher
 
   val routes =
+//    new IndexResource().route ~
     new RegistrationService(registration).route ~
     new MessengerService(messenger).route
 
