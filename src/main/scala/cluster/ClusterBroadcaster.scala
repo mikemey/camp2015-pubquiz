@@ -2,7 +2,7 @@ package cluster
 
 import akka.actor._
 import akka.cluster.Cluster
-import cluster.ClusterBroadcaster.{BroadcastQuestion, Question, DefaultQuestionExpirationInMinutes}
+import cluster.ClusterBroadcaster.{DefaultQuestionExpirationInMinutes, Question}
 
 object ClusterBroadcaster {
 

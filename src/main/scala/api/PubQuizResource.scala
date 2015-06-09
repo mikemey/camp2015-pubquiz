@@ -18,6 +18,17 @@ class PubQuizResource(clusterBroadcaster: ActorRef)
   implicit val answerFormat = jsonFormat2(Choice)
   implicit val questionFormat = jsonFormat2(BroadcastQuestion)
 
+  def questionFromFields
+  (question: String, answerA: String, answerB: String, answerC: String, answerD: String, correct: String) = {
+    val choices = Seq(
+      Choice(answerA, "A" == correct),
+      Choice(answerB, "B" == correct),
+      Choice(answerC, "C" == correct),
+      Choice(answerD, "D" == correct))
+
+    BroadcastQuestion(question, choices)
+  }
+
   val route =
     path("question") {
       get {
@@ -26,13 +37,11 @@ class PubQuizResource(clusterBroadcaster: ActorRef)
         }
       } ~
         post {
-          handleWith {
-            case question: BroadcastQuestion => {
-              println("received question: " + question)
-              clusterBroadcaster ! question
-              "{ 'result': 'ok'}"
-            }
-            case any => println("request not recognized: " + any)
+          formFields('question, 'answerA, 'answerB, 'answerC, 'answerD, 'correct) {
+            (question, answerA, answerB, answerC, answerD, correct) =>
+              val broadcastQuestion = questionFromFields(question, answerA, answerB, answerC, answerD, correct)
+              clusterBroadcaster ! broadcastQuestion
+              complete("{ 'result': 'ok' }")
           }
         }
     }
