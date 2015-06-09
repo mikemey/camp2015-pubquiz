@@ -1,7 +1,19 @@
 package cluster
 
-import akka.actor.{Actor, ActorLogging}
+import akka.actor._
+import cluster.ClusterBroadcaster.{Answer, PullQuestion, Question}
 
 class Julio extends Actor with ActorLogging {
-  override def receive: Receive = ???
+
+  var question: Question = null
+
+  override def receive: Receive = {
+
+    case question: Question =>
+      this.question = question
+
+    case PullQuestion => Option(question)
+
+    case answer: Answer => Option(question).map(question.respondTo ! _)
+  }
 }
