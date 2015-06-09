@@ -16,6 +16,8 @@ object ClusterBroadcaster {
 
   case class Answer(value: String)
 
+  case object PullQuestion
+
 }
 
 class ClusterBroadcaster extends Actor with ActorLogging {
