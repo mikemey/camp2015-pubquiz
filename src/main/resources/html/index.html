@@ -12,7 +12,10 @@
 </head>
 <body>
 <div class="container">
+
     <h1>Welcome to Pub Quizzzz</h1>
+
+    <button onclick="javascript:bla()">Click me</button>
 
     <form id="questionForm" action="/question" method="POST">
         <div class="form-group">
@@ -52,6 +55,32 @@
         </div>
         <button type="submit" class="btn btn-default">Submit</button>
     </form>
+
+    <form id="answerForm" action="/answer" method="POST">
+        <div class="form-group" id="curQuestion"></div>
+        <div class="radio">
+            <label>
+                <input type="radio" id="curAnswerA" value="">
+            </label>
+        </div>
+        <div class="radio">
+            <label>
+                <input type="radio" id="curAnswerB" value="">
+            </label>
+        </div>
+        <div class="radio">
+            <label>
+                <input type="radio" id="curAnswerC" value="">
+            </label>
+        </div>
+        <div class="radio">
+            <label>
+                <input type="radio" id="curAnswerD" value="">
+            </label>
+        </div>
+        <button type="submit" class="btn btn-default">Answer</button>
+    </form>
+
 </div>
 </body>
 </html>
