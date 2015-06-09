@@ -51,7 +51,7 @@ class PubQuizResource(clusterBroadcaster: ActorRef, julio: ActorRef)
           }
         }
     } ~
-      path("quiz/question") {
+      path("quiz" / "question") {
         get {
           respondWithMediaType(`application/json`) {
             complete {
@@ -61,6 +61,13 @@ class PubQuizResource(clusterBroadcaster: ActorRef, julio: ActorRef)
                 )
               }
             }
+          }
+        }
+        post {
+          formFields('answer) {
+            (answer) =>
+              julio ! Answer(answer)
+              complete("{ 'result': 'ok' }")
           }
         }
       }
