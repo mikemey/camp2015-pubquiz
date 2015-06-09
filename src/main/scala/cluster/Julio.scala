@@ -18,5 +18,7 @@ class Julio extends Actor with ActorLogging {
     case answer: Answer => Option(question).map(question.respondTo ! _)
 
     case "Lavate JULIO!" => log.info("Tengo que lavarme tio! Hoy no, manana!")
+
+    case _ => log.warning("Julio - Unknown message")
   }
 }

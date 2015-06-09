@@ -19,6 +19,8 @@ class Ciccio extends Actor with ActorLogging {
       log.info("Julio tiene que lavarse")
       val julio = context.actorSelection("/user/julio")
       julio ! "Lavate JULIO!"
+
+    case _ => log.warning("Ciccio - Unknown message")
   }
 
 }

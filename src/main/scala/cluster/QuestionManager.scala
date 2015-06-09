@@ -33,6 +33,8 @@ class QuestionManager(question: String, correctAnswer: String, expiresInMinutes:
     case Answer(value) =>
       recordedAnswers + (sender.path.address.toString -> (value == correctAnswer))
       finishIfGameIsOver()
+
+    case _ => log.warning("QuestionManager - Unknown message")
   }
 
 
