@@ -36,21 +36,28 @@ class PubQuizResource(clusterBroadcaster: ActorRef, julio: ActorRef)
   }
 
   val route =
-    path("question") {
+    path("app.js") {
       get {
-        respondWithMediaType(`text/html`) {
-          getFromFile("src/main/resources/html/index.html")
+        respondWithMediaType(`application/javascript`) {
+          getFromFile("src/main/resources/js/app.js")
         }
-      } ~
-        post {
-          formFields('question, 'answerA, 'answerB, 'answerC, 'answerD, 'correct) {
-            (question, answerA, answerB, answerC, answerD, correct) =>
-              val broadcastQuestion = questionFromFields(question, answerA, answerB, answerC, answerD, correct)
-              clusterBroadcaster ! broadcastQuestion
-              complete("{ 'result': 'ok' }")
-          }
-        }
+      }
     } ~
+      path("question") {
+        get {
+          respondWithMediaType(`text/html`) {
+            getFromFile("src/main/resources/html/index.html")
+          }
+        } ~
+          post {
+            formFields('question, 'answerA, 'answerB, 'answerC, 'answerD, 'correct) {
+              (question, answerA, answerB, answerC, answerD, correct) =>
+                val broadcastQuestion = questionFromFields(question, answerA, answerB, answerC, answerD, correct)
+                clusterBroadcaster ! broadcastQuestion
+                complete("{ 'result': 'ok' }")
+            }
+          }
+      } ~
       path("quiz" / "question") {
         get {
           respondWithMediaType(`application/json`) {
