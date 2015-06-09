@@ -1,14 +1,14 @@
 package cluster
 
-import akka.actor.{Actor, ActorLogging, ActorRef}
+import akka.actor.{Actor, ActorLogging}
 import akka.cluster.ClusterEvent.{InitialStateAsEvents, MemberEvent, MemberRemoved, UnreachableMember}
 import akka.cluster.{Cluster, Member}
-import cluster.ClusterBroadcaster.Answer
+import cluster.ClusterBroadcaster.{Answer, Results}
 import spray.http.DateTime
 
-class QuestionManager(correctAnswer: String, expiresInMinutes: Int, var participants: Seq[Member]) extends Actor with ActorLogging {
+class QuestionManager(question: String, correctAnswer: String, expiresInMinutes: Int, var participants: Seq[Member]) extends Actor with ActorLogging {
   val cluster = Cluster(context.system)
-  var recordedAnswers: collection.mutable.Map[ActorRef, Boolean] = collection.mutable.Map()
+  var recordedAnswers: collection.mutable.Map[String, Boolean] = collection.mutable.Map()
   val quizStartTime = DateTime.now
 
   override def preStart(): Unit = {
@@ -31,7 +31,7 @@ class QuestionManager(correctAnswer: String, expiresInMinutes: Int, var particip
       finishIfGameIsOver()
 
     case Answer(value) =>
-      recordedAnswers + (sender -> (value == correctAnswer))
+      recordedAnswers + (sender.path.address.toString -> (value == correctAnswer))
       finishIfGameIsOver()
   }
 
@@ -42,8 +42,8 @@ class QuestionManager(correctAnswer: String, expiresInMinutes: Int, var particip
       (quizStartTime + expirationInMillis).compareTo(DateTime.now) > 0
     }
     if (recordedAnswers.size == participants.size || timesUp) {
-      //send message with results to UI
-      Unit
+      context.actorSelection("/user/ciccio") ! Results(question, Map() ++ recordedAnswers)
+      context.stop(self)
     } else Unit
 
   }

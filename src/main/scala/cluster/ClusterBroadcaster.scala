@@ -18,6 +18,10 @@ object ClusterBroadcaster {
 
   case object PullQuestion
 
+  case class Results(question: String, answers: Map[String, Boolean])
+
+  case object PullResults
+
 }
 
 class ClusterBroadcaster extends Actor with ActorLogging {
@@ -37,7 +41,7 @@ class ClusterBroadcaster extends Actor with ActorLogging {
       val selfAddress = this.self.path.address
       val activeMembers = cluster.state.getMembers.asScala.filterNot(_.address == selfAddress)
 
-      val questionManager = context.actorOf(Props(classOf[QuestionManager], correctAnswer, DefaultQuestionExpirationInMinutes,
+      val questionManager = context.actorOf(Props(classOf[QuestionManager], question, correctAnswer, DefaultQuestionExpirationInMinutes,
         activeMembers), s"question-manager-${(Math.random() * 100).toInt}")
 
       activeMembers.foreach { member =>
