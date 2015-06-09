@@ -9,7 +9,6 @@ object Rest extends App {
   val config = ConfigFactory.load("application")
   implicit lazy val system = ActorSystem("ClusterSystem", config)
 
-  private implicit val _ = system.dispatcher
   val rootService = system.actorOf(Props(new RoutedHttpService()))
 
   IO(Http)(system) ! Http.Bind(rootService, "0.0.0.0", port = 8080)

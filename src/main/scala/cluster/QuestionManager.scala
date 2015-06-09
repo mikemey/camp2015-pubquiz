@@ -1,7 +1,7 @@
 package cluster
 
 import akka.actor.{Actor, ActorLogging}
-import akka.cluster.ClusterEvent.{InitialStateAsEvents, MemberEvent, MemberRemoved, UnreachableMember}
+import akka.cluster.ClusterEvent._
 import akka.cluster.{Cluster, Member}
 import cluster.ClusterBroadcaster.{Answer, Results}
 import spray.http.DateTime
@@ -30,11 +30,14 @@ class QuestionManager(question: String, correctAnswer: String, expiresInMinutes:
       participants = participants.filterNot(_ == member)
       finishIfGameIsOver()
 
+    case MemberUp(member) =>
+      log.info("Member detected as up: {}", member)
+
     case Answer(value) =>
       recordedAnswers + (sender.path.address.toString -> (value == correctAnswer))
       finishIfGameIsOver()
 
-    case _ => log.warning("QuestionManager - Unknown message")
+    case s => log.warning("QuestionManager - Unknown message: " + s)
   }
 
 

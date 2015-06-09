@@ -5,12 +5,13 @@ $( document ).ready(function() {
     function pollQuestion() {
       $.get("/quiz/question", function( data ) {
         if(data.question) {
+           abortTimer();
            swapForms(data);
         }
       });
     }
 
-    function abortTimer() { // to be called when you want to stop the timer
+    function abortTimer() {
       clearInterval(tid);
     }
 

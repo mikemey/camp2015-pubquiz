@@ -41,12 +41,14 @@ class ClusterBroadcaster extends Actor with ActorLogging {
       val selfAddress = cluster.selfAddress
       val activeMembers = cluster.state.getMembers.asScala.filterNot(_.address == selfAddress)
 
-      val questionManager = context.actorOf(Props(classOf[QuestionManager], question, correctAnswer, DefaultQuestionExpirationInMinutes,
+      val questionManager = cluster.system.actorOf(Props(classOf[QuestionManager], question, correctAnswer, DefaultQuestionExpirationInMinutes,
         activeMembers), s"question-manager-${(Math.random() * 100).toInt}")
 
       activeMembers.foreach { member =>
-        val memberRef = context.actorSelection(s"${member.address.toString}/user/julio")
-        memberRef ! Question(question, choices.map(_.value), questionManager)
+        val remoteJulio = cluster.system.actorSelection(s"${member.address.toString}/user/julio")
+        val data = Question(question, choices.map(_.value), questionManager)
+        println(s"sending question ${question} \nto member ${remoteJulio}")
+        remoteJulio ! data
       }
     case _ => log.warning(s"Unknown message")
   }
