@@ -69,7 +69,7 @@ class PubQuizResource(clusterBroadcaster: ActorRef, julio: ActorRef)
               }
             }
           }
-        }
+        } ~
         post {
           formFields('answer) {
             (answer) =>
