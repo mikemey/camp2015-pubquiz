@@ -14,6 +14,11 @@ class Ciccio extends Actor with ActorLogging {
 
     case PullResults =>
       sender() ! Option(results)
+
+    case "System is started! Tell Julio!" =>
+      log.info("Julio tiene que lavarse")
+      val julio = context.actorSelection("/user/julio")
+      julio ! "Lavate JULIO!"
   }
 
 }
