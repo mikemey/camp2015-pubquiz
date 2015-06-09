@@ -2,6 +2,7 @@ package api
 
 import akka.actor.{ActorRef, ActorRefFactory}
 import akka.pattern.ask
+import akka.util.Timeout
 import cluster.ClusterBroadcaster
 import spray.http.MediaTypes._
 import spray.httpx.SprayJsonSupport
@@ -11,6 +12,7 @@ import spray.routing.directives.ContentTypeResolver
 import spray.routing.{Directives, RoutingSettings}
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration._
 
 class PubQuizResource(clusterBroadcaster: ActorRef, julio: ActorRef)
                      (implicit settings: RoutingSettings, resolver: ContentTypeResolver, refFactory: ActorRefFactory)
@@ -20,6 +22,7 @@ class PubQuizResource(clusterBroadcaster: ActorRef, julio: ActorRef)
 
   implicit val answerFormat = jsonFormat2(Choice)
   implicit val broadcastQuestionFormat = jsonFormat2(BroadcastQuestion)
+  implicit val timeout = Timeout(5 seconds)
 
   def questionFromFields
   (question: String, answerA: String, answerB: String, answerC: String, answerD: String, correct: String) = {
@@ -54,11 +57,15 @@ class PubQuizResource(clusterBroadcaster: ActorRef, julio: ActorRef)
             complete {
               (julio ? PullQuestion).mapTo[Option[Question]].map { optionalQuestion =>
                 optionalQuestion.fold("{}")(question =>
-                  s"""{"question": "${question.question}", "answers": [${question.choices.map(_ => s""""$_"""")}]}"""
+                  s"""{"question": "${question.question}", "answers": ${choicesToJson(question.choices)}"""
                 )
               }
             }
           }
         }
       }
+
+  def choicesToJson(choices: Seq[String]): String = {
+    "[" + choices.map(c => s""" "$c" """).mkString(",") + "]"
+  }
 }
