@@ -12,7 +12,8 @@ class Ciccio extends Actor with ActorLogging {
     case results: Results =>
       this.results = results
 
-    case PullResults => Option(results)
+    case PullResults =>
+      sender() ! Option(results)
   }
 
 }

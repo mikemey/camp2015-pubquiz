@@ -12,8 +12,10 @@ class Julio extends Actor with ActorLogging {
     case question: Question =>
       this.question = question
 
-    case PullQuestion => Option(question)
+    case PullQuestion =>
+      sender() ! Option(question)
 
-    case answer: Answer => Option(question).map(question.respondTo ! _)
+    case answer: Answer =>
+      Option(question).map(question.respondTo ! _)
   }
 }
