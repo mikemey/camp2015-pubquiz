@@ -64,7 +64,7 @@ class PubQuizResource(clusterBroadcaster: ActorRef, julio: ActorRef)
             complete {
               (julio ? PullQuestion).mapTo[Option[Question]].map { optionalQuestion =>
                 optionalQuestion.fold("{}")(question =>
-                  s"""{"question": "${question.question}", "answers": ${choicesToJson(question.choices)}"""
+                  s"""{"question": "${question.question}", "answers": ${choicesToJson(question.choices)}}"""
                 )
               }
             }
