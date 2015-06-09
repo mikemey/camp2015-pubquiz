@@ -17,6 +17,8 @@ libraryDependencies ++= Seq(
   "io.spray"               %% "spray-can"          % "1.3.3",
   "io.spray"               %% "spray-routing"      % "1.3.3",
   "io.spray"               %% "spray-json"         % "1.3.2",
+  "org.apache.commons"      % "commons-lang3"      % "3.4",
+  "com.google.guava"        % "guava"              % "18.0",
   "io.spray"               %% "spray-testkit"      % "1.3.3"     % "test",
   "com.typesafe.akka"      %% "akka-testkit"       % "2.4-M1"    % "test",
   "org.scalatest"          %% "scalatest"          % "2.2.5"      % "test",

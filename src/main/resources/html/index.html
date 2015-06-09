@@ -1,15 +1,56 @@
 <html>
 
 <head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
+
+    <script src="http://code.jquery.com/jquery-git2.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+
     <title>PubQuiz</title>
 </head>
 <body>
+<div class="container">
+    <h1>Welcome to Pub Quizzzz</h1>
 
-<h1>Welcome to Pub Quizzzz</h1>
-
-First question: Who put the ball in the net?
-
-A1: You
-A2: I
+    <form action="/question" method="POST">
+        <div class="form-group">
+            <label for="question">Broadcast question:</label>
+            <input type="text" class="form-control" id="question" name="question" placeholder="Enter question">
+        </div>
+        <div class="form-group">
+            <label>Answers:</label>
+        </div>
+        <div class="form-group">
+            Answer A
+            <input type="text" class="form-control" id="answerA" name="answerA" placeholder="Answer A">
+            <label>
+                <input name="correctA" type="checkbox"> is correct
+            </label>
+        </div>
+        <div class="form-group">
+            Answer B
+            <input type="text" class="form-control" id="answerB" name="answerB" placeholder="Answer B">
+            <label>
+                <input name="correctB" type="checkbox"> is correct
+            </label>
+        </div>
+        <div class="form-group">
+            Answer C
+            <input type="text" class="form-control" id="answerC" name="answerC" placeholder="Answer C">
+            <label>
+                <input name="correctC" type="checkbox"> is correct
+            </label>
+        </div>
+        <div class="form-group">
+            Answer D
+            <input type="text" class="form-control" id="answerD" name="answerD" placeholder="Answer D">
+            <label>
+                <input name="correctD" type="checkbox"> is correct
+            </label>
+        </div>
+        <button type="submit" class="btn btn-default">Submit</button>
+    </form>
+</div>
 </body>
 </html>

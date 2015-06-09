@@ -1,13 +1,17 @@
 package api
 
-import akka.actor.ActorRef
+import akka.actor.{ActorRef, ActorRefFactory}
 import cluster.ClusterBroadcaster
-import spray.routing.Directives
+import spray.http.MediaTypes._
+import spray.httpx.SprayJsonSupport
+import spray.httpx.marshalling.MetaMarshallers
+import spray.json.DefaultJsonProtocol
+import spray.routing.directives.ContentTypeResolver
+import spray.routing.{Directives, RoutingSettings}
 
-import scala.concurrent.ExecutionContext
-
-class PubQuizResource(clusterBroadcaster: ActorRef)(implicit executionContext: ExecutionContext)
-  extends Directives with DefaultJsonFormats {
+class PubQuizResource(clusterBroadcaster: ActorRef)
+                     (implicit settings: RoutingSettings, resolver: ContentTypeResolver, refFactory: ActorRefFactory)
+  extends Directives with DefaultJsonProtocol with SprayJsonSupport with MetaMarshallers {
 
   import ClusterBroadcaster._
 
@@ -16,14 +20,20 @@ class PubQuizResource(clusterBroadcaster: ActorRef)(implicit executionContext: E
 
   val route =
     path("question") {
-      post {
-        handleWith {
-          question: BroadcastQuestion =>
-            println("received question: " + question)
-            clusterBroadcaster ! question
-            "{ 'result': 'Question posted.'}"
+      get {
+        respondWithMediaType(`text/html`) {
+          getFromFile("src/main/resources/html/index.html")
         }
-      }
+      } ~
+        post {
+          handleWith {
+            case question: BroadcastQuestion => {
+              println("received question: " + question)
+              clusterBroadcaster ! question
+              "{ 'result': 'ok'}"
+            }
+            case any => println("request not recognized: " + any)
+          }
+        }
     }
-
 }
