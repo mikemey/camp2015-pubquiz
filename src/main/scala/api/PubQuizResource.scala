@@ -1,6 +1,7 @@
 package api
 
 import akka.actor.{ActorRef, ActorRefFactory}
+import akka.pattern.ask
 import cluster.ClusterBroadcaster
 import spray.http.MediaTypes._
 import spray.httpx.SprayJsonSupport
@@ -9,14 +10,16 @@ import spray.json.DefaultJsonProtocol
 import spray.routing.directives.ContentTypeResolver
 import spray.routing.{Directives, RoutingSettings}
 
-class PubQuizResource(clusterBroadcaster: ActorRef)
+import scala.concurrent.ExecutionContext.Implicits.global
+
+class PubQuizResource(clusterBroadcaster: ActorRef, julio: ActorRef)
                      (implicit settings: RoutingSettings, resolver: ContentTypeResolver, refFactory: ActorRefFactory)
   extends Directives with DefaultJsonProtocol with SprayJsonSupport with MetaMarshallers {
 
   import ClusterBroadcaster._
 
   implicit val answerFormat = jsonFormat2(Choice)
-  implicit val questionFormat = jsonFormat2(BroadcastQuestion)
+  implicit val broadcastQuestionFormat = jsonFormat2(BroadcastQuestion)
 
   def questionFromFields
   (question: String, answerA: String, answerB: String, answerC: String, answerD: String, correct: String) = {
@@ -44,5 +47,18 @@ class PubQuizResource(clusterBroadcaster: ActorRef)
               complete("{ 'result': 'ok' }")
           }
         }
-    }
+    } ~
+      path("quiz/question") {
+        get {
+          respondWithMediaType(`application/json`) {
+            complete {
+              (julio ? PullQuestion).mapTo[Option[Question]].map { optionalQuestion =>
+                optionalQuestion.fold("{}")(question =>
+                  s"""{"question": "${question.question}", "answers": [${question.choices.map(_ => s""""$_"""")}]}"""
+                )
+              }
+            }
+          }
+        }
+      }
 }
