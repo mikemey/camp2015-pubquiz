@@ -109,4 +109,8 @@ object PubQuizResource {
 
   case class UIQuestion(question: String, answers: Seq[String])
 
+  case class UIResult(id: String, isCorrect: Boolean)
+
+  case class UIResults(question: String, results: Seq[UIResult], localIsWinner: Boolean)
+
 }
