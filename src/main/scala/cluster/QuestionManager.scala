@@ -30,25 +30,26 @@ class QuestionManager(question: String, correctAnswer: String, expiresInMinutes:
       participants = participants.filterNot(_ == member)
       finishIfGameIsOver()
 
-    // Used to not have warnings of death letters for this event
     case MemberUp(member) =>
       log.info("Member detected as up: {}", member)
 
     case Answer(value) =>
-      recordedAnswers + (sender.path.address.toString -> (value == correctAnswer))
+      val senderAddress = sender.path.address.toString
+      log.info(s"received answer from ${senderAddress} - '${value}'")
+
+      recordedAnswers + (senderAddress -> (value == correctAnswer))
       finishIfGameIsOver()
 
     case s => log.warning("QuestionManager - Unknown message: " + s)
   }
 
-  // TODO: take into account when the game is over due to timeout, send message to the broadcaster to notify all ciccios
+
   private def finishIfGameIsOver(): Unit = {
     def timesUp = {
       val expirationInMillis = expiresInMinutes * 60000
       (quizStartTime + expirationInMillis).compareTo(DateTime.now) > 0
     }
     if (recordedAnswers.size == participants.size || timesUp) {
-      // TODO: This guy needs to know where is the ciccio, or better send this to the Broadcaster
       context.actorSelection("/user/ciccio") ! Results(question, Map() ++ recordedAnswers)
       context.stop(self)
     } else Unit
