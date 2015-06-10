@@ -4,7 +4,7 @@ $( document ).ready(function() {
     var tid = setInterval(pollQuestion, 800);
     function pollQuestion() {
       $.get("/quiz/question", function( data ) {
-        if(data.question) {
+        if(data != null && data.question) {
            abortTimer();
            swapForms(data);
         }
@@ -13,13 +13,6 @@ $( document ).ready(function() {
 
     function abortTimer() {
       clearInterval(tid);
-    }
-
-    this.bla = function() {
-        swapForms( {
-            question: 'lalal',
-            answers: [ 'lala 1', 'lala 2', 'lala 3', 'lala 4']
-        });
     }
 
     function swapForms(data) {

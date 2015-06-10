@@ -6,7 +6,7 @@ $( document ).ready(function() {
     var tid = setInterval(pollQuestion, 800);
     function pollQuestion() {
       $.get("/answer/result", function( data ) {
-        if(data.question) {
+        if(data != null && data.question) {
            abortTimer();
            showResult(data);
         }
@@ -28,7 +28,7 @@ $( document ).ready(function() {
     }
 
     function printResults(results) {
-        results.foreach(function(item) {
+        $.each(results, function( index, item ) {
             var result = item.isCorrect ? "correct answer" : "wrong answer";
             $('#results').append("<tr><td>" + item.id + "</td><td>" + result + "</td></tr>")
         });
