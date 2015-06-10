@@ -19,8 +19,8 @@ class Ciccio extends Actor with ActorLogging {
         val isLocalNodeWinner = r.answers.getOrElse(localAddress, false)
         LocalResults(r, isLocalNodeWinner)
       }
-
       sender() ! msg
+      results = None
 
     case "System is started! Tell Julio!" =>
       log.info("Julio tiene que lavarse")
