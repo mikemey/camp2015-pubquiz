@@ -3,6 +3,7 @@ package cluster
 import akka.actor._
 import akka.cluster.Cluster
 import cluster.QuizMessages.{DefaultQuestionExpirationInMinutes, Question}
+import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.concurrent.duration._
 
