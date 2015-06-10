@@ -7,7 +7,7 @@ import cluster.ClusterBroadcaster
 import spray.http.MediaTypes._
 import spray.httpx.SprayJsonSupport
 import spray.httpx.marshalling.MetaMarshallers
-import spray.json.DefaultJsonProtocol
+import spray.json.{DefaultJsonProtocol, _}
 import spray.routing.directives.ContentTypeResolver
 import spray.routing.{Directives, RoutingSettings}
 
@@ -19,9 +19,12 @@ class PubQuizResource(clusterBroadcaster: ActorRef, julio: ActorRef, ciccio: Act
   extends Directives with DefaultJsonProtocol with SprayJsonSupport with MetaMarshallers {
 
   import ClusterBroadcaster._
+  import PubQuizResource._
 
   implicit val answerFormat = jsonFormat2(Choice)
   implicit val broadcastQuestionFormat = jsonFormat2(BroadcastQuestion)
+  implicit val questionUiFormat = jsonFormat2(UIQuestion)
+
   implicit val timeout = Timeout(5 seconds)
 
   def questionFromFields
@@ -63,9 +66,7 @@ class PubQuizResource(clusterBroadcaster: ActorRef, julio: ActorRef, ciccio: Act
           respondWithMediaType(`application/json`) {
             complete {
               (julio ? PullQuestion).mapTo[Option[Question]].map { optionalQuestion =>
-                optionalQuestion.fold("{}")(question =>
-                  s"""{"question": "${question.question}", "answers": ${choicesToJson(question.choices)}}"""
-                )
+                optionalQuestion.map(q => UIQuestion(q.question, q.choices)).toJson.prettyPrint
               }
             }
           }
@@ -92,12 +93,13 @@ class PubQuizResource(clusterBroadcaster: ActorRef, julio: ActorRef, ciccio: Act
           }
       }
 
-  def choicesToJson(choices: Seq[String]): String = {
-    "[" + choices.map(c => s""" "$c" """).mkString(",") + "]"
-  }
-
-
   def resultAnswersToJson(answers: Map[String, Boolean]): String = {
-    "{" + answers.map{case (actor, result) => s""" "$actor" : $result """}.mkString(",") + "}"
+    "{" + answers.map { case (actor, result) => s""" "$actor" : $result """ }.mkString(",") + "}"
   }
+}
+
+object PubQuizResource {
+
+  case class UIQuestion(question: String, answers: Seq[String])
+
 }
