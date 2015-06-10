@@ -3,7 +3,6 @@ package api
 import akka.actor.{ActorRef, ActorRefFactory}
 import akka.pattern.ask
 import akka.util.Timeout
-import cluster.QuizMessages
 import spray.http.MediaTypes._
 import spray.http.StatusCodes
 import spray.httpx.SprayJsonSupport
@@ -19,12 +18,14 @@ class PubQuizResource(clusterBroadcaster: ActorRef, julio: ActorRef, ciccio: Act
                      (implicit settings: RoutingSettings, resolver: ContentTypeResolver, refFactory: ActorRefFactory)
   extends Directives with DefaultJsonProtocol with SprayJsonSupport with MetaMarshallers {
 
-  import QuizMessages._
-  import PubQuizResource._
+  import api.PubQuizResource._
+  import cluster.QuizMessages._
 
   implicit val answerFormat = jsonFormat2(Choice)
   implicit val broadcastQuestionFormat = jsonFormat2(BroadcastQuestion)
   implicit val questionUiFormat = jsonFormat2(UIQuestion)
+  implicit val resultsFormat = jsonFormat2(Results)
+  implicit val localResultsFormat = jsonFormat2(LocalResults)
 
   implicit val timeout = Timeout(5 seconds)
 
@@ -94,10 +95,8 @@ class PubQuizResource(clusterBroadcaster: ActorRef, julio: ActorRef, ciccio: Act
             get {
               respondWithMediaType(`application/json`) {
                 complete {
-                  (ciccio ? PullResults).mapTo[Option[Results]].map { optionalResults =>
-                    optionalResults.fold("{}")(results =>
-                      s"""{"question": "${results.question}", "answers": ${resultAnswersToJson(results.answers)}}"""
-                    )
+                  (ciccio ? PullResults).mapTo[Option[LocalResults]].map { optionalResults =>
+                    optionalResults.toJson.prettyPrint
                   }
                 }
               }
@@ -106,10 +105,8 @@ class PubQuizResource(clusterBroadcaster: ActorRef, julio: ActorRef, ciccio: Act
       }
 
 
-
-
   def resultAnswersToJson(answers: Map[String, Boolean]): String = {
-    "{" + answers.map { case (actor, result) => s""" "$actor" : $result """ }.mkString(",") + "}"
+    "{" + answers.map { case (actor, result) => s""" "$actor" : $result """}.mkString(",") + "}"
   }
 }
 
