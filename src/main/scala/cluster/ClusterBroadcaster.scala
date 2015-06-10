@@ -32,8 +32,6 @@ class ClusterBroadcaster extends Actor with ActorLogging {
 
   val cluster = Cluster(context.system)
 
-  override def postStop(): Unit = cluster.unsubscribe(self)
-
   def receive = {
     case BroadcastQuestion(question, choices) =>
 
@@ -41,6 +39,7 @@ class ClusterBroadcaster extends Actor with ActorLogging {
       val selfAddress = cluster.selfAddress
       val activeMembers = cluster.state.getMembers.asScala.filterNot(_.address == selfAddress)
 
+      // TODO: When it expires, the broadcaster should be watching this guy and notify Julio that there is not question
       val questionManager = cluster.system.actorOf(Props(classOf[QuestionManager], question, correctAnswer, DefaultQuestionExpirationInMinutes,
         activeMembers), s"question-manager-${(Math.random() * 100).toInt}")
 
