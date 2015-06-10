@@ -15,7 +15,7 @@ class Julio extends Actor with ActorLogging {
     case PullQuestion =>
       sender() ! Option(question)
 
-    case answer: Answer => Option(question).foreach(question.respondTo ! _)
+    case answer: Answer => Option(question).foreach(_.respondTo ! answer)
 
     case "Lavate JULIO!" => log.info("Tengo que lavarme tio! Hoy no, manana!")
 
