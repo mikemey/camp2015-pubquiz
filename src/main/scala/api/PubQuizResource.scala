@@ -75,19 +75,21 @@ class PubQuizResource(clusterBroadcaster: ActorRef, julio: ActorRef, ciccio: Act
           }
         }
       } ~
-      path("answer") {
-        get {
-          respondWithMediaType(`text/html`) {
-            getFromFile("src/main/resources/html/answer.html")
-          }
-        } ~
-          post {
-            formFields('answer) {
-              (answer) =>
-                julio ! Answer(answer)
-                redirect("answer", StatusCodes.SeeOther)
+      pathPrefix("answer") {
+        pathEnd {
+          get {
+            respondWithMediaType(`text/html`) {
+              getFromFile("src/main/resources/html/answer.html")
             }
           } ~
+            post {
+              formFields('answer) {
+                (answer) =>
+                  julio ! Answer(answer)
+                  redirect("answer", StatusCodes.SeeOther)
+              }
+            }
+        } ~
           path("result") {
             get {
               respondWithMediaType(`application/json`) {
@@ -102,6 +104,8 @@ class PubQuizResource(clusterBroadcaster: ActorRef, julio: ActorRef, ciccio: Act
             }
           }
       }
+
+
 
 
   def resultAnswersToJson(answers: Map[String, Boolean]): String = {
