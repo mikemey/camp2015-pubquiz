@@ -19,7 +19,6 @@ $( document ).ready(function() {
 
     function showResult(data) {
         $('#spinner').hide();
-        alert(data.localIsWinner);
         if( data.localIsWinner ) {
             $('#correct').show();
         } else {
