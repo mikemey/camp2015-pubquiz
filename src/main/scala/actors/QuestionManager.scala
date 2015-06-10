@@ -1,13 +1,13 @@
-package cluster
+package actors
 
 import akka.actor.{Actor, ActorLogging}
 import akka.cluster.ClusterEvent._
 import akka.cluster.{Cluster, Member}
-import cluster.QuizMessages.{QuestionTimeOut, Answer, AnswerResult, Results}
+import actors.QuizMessages.{QuestionTimeOut, Answer, AnswerResult, Results}
 import spray.http.DateTime
 
 
-class QuestionManager(question: String, correctAnswer: String, expiresInMinutes: Int, var participants: Seq[Member]) extends Actor with ActorLogging {
+class QuestionManager(question: String, correctAnswer: String, var participants: Seq[Member]) extends Actor with ActorLogging {
   val cluster = Cluster(context.system)
   var recordedAnswers: collection.mutable.Buffer[AnswerResult] = collection.mutable.Buffer[AnswerResult]()
   var timesUp = false
@@ -61,7 +61,7 @@ class QuestionManager(question: String, correctAnswer: String, expiresInMinutes:
   private def broadcastResults(results: Results) = {
     participants.foreach { member =>
       val remoteCiccio = cluster.system.actorSelection(s"${member.address.toString}/user/ciccio")
-      println(s"sending results $results \nto member $remoteCiccio")
+      log.info(s"sending results $results to member $remoteCiccio")
       remoteCiccio ! results
     }
     context.actorSelection("/user/ciccio") ! results

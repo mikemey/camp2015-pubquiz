@@ -1,7 +1,7 @@
-package api
+package rest
 
 import akka.actor.{Actor, ActorContext, Props}
-import cluster.{Ciccio, ClusterBroadcaster, Julio}
+import actors.{Ciccio, ClusterBroadcaster, Julio}
 import com.typesafe.config.ConfigFactory
 import spray.routing._
 

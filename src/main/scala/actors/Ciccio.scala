@@ -1,8 +1,7 @@
-package cluster
+package actors
 
 import akka.actor.{Actor, ActorLogging}
-import cluster.QuizMessages._
-
+import actors.QuizMessages._
 
 class Ciccio extends Actor with ActorLogging {
 
@@ -11,7 +10,7 @@ class Ciccio extends Actor with ActorLogging {
   override def receive: Receive = {
 
     case results: Results =>
-      println("ciccio reveived the results: " + results)
+      log.info(s"ciccio received the results: $results")
       this.results = Some(results)
 
     case PullResults =>
@@ -27,7 +26,8 @@ class Ciccio extends Actor with ActorLogging {
       log.info("Julio tiene que lavarse")
       context.actorSelection("/user/julio") ! "Lavate JULIO!"
 
-    case _ => log.warning("Ciccio - Unknown message")
+    case _ =>
+      log.warning("Ciccio - Unknown message")
   }
 
 }

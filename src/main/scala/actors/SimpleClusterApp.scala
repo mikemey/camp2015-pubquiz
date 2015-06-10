@@ -1,4 +1,4 @@
-package cluster
+package actors
 
 import akka.actor.{ActorSystem, Props}
 import com.typesafe.config.ConfigFactory

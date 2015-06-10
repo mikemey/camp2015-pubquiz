@@ -1,9 +1,8 @@
-package api
+package rest
 
 import akka.actor.{ActorRef, ActorRefFactory}
 import akka.pattern.ask
 import akka.util.Timeout
-import cluster.QuizMessages.PullResults
 import spray.http.MediaTypes._
 import spray.http.StatusCodes
 import spray.httpx.SprayJsonSupport
@@ -19,16 +18,10 @@ class PubQuizResource(clusterBroadcaster: ActorRef, julio: ActorRef, ciccio: Act
                      (implicit settings: RoutingSettings, resolver: ContentTypeResolver, refFactory: ActorRefFactory)
   extends Directives with DefaultJsonProtocol with SprayJsonSupport with MetaMarshallers {
 
-  import api.PubQuizResource._
-  import cluster.QuizMessages._
+  import UIModel._
+  import actors.QuizMessages._
 
-  implicit val answerFormat = jsonFormat2(Choice)
-  implicit val broadcastQuestionFormat = jsonFormat2(BroadcastQuestion)
-  implicit val questionUiFormat = jsonFormat2(UIQuestion)
-  implicit val uiResultFormat = jsonFormat2(UIResult)
-  implicit val uiResultsFormat = jsonFormat3(UIResults)
-
-  implicit val timeout = Timeout(5 seconds)
+  implicit val timeout = Timeout(5.seconds)
 
   def questionFromFields
   (question: String, answerA: String, answerB: String, answerC: String, answerD: String, correct: String) = {
@@ -117,14 +110,4 @@ class PubQuizResource(clusterBroadcaster: ActorRef, julio: ActorRef, ciccio: Act
             }
           }
       }
-}
-
-object PubQuizResource {
-
-  case class UIQuestion(question: String, answers: Seq[String])
-
-  case class UIResult(id: String, isCorrect: Boolean)
-
-  case class UIResults(question: String, results: Seq[UIResult], localIsWinner: Boolean)
-
 }

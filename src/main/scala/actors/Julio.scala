@@ -1,7 +1,7 @@
-package cluster
+package actors
 
 import akka.actor._
-import cluster.QuizMessages.{Answer, PullQuestion, Question}
+import actors.QuizMessages.{Answer, PullQuestion, Question}
 
 class Julio(participantName: String) extends Actor with ActorLogging {
 
