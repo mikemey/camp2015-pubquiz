@@ -11,6 +11,7 @@ class Ciccio extends Actor with ActorLogging {
   override def receive: Receive = {
 
     case results: Results =>
+      println("ciccio reveived the results: " + results)
       this.results = Some(results)
 
     case PullResults =>

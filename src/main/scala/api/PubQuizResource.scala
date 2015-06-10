@@ -3,6 +3,7 @@ package api
 import akka.actor.{ActorRef, ActorRefFactory}
 import akka.pattern.ask
 import akka.util.Timeout
+import cluster.QuizMessages.PullResults
 import spray.http.MediaTypes._
 import spray.http.StatusCodes
 import spray.httpx.SprayJsonSupport
@@ -50,18 +51,27 @@ class PubQuizResource(clusterBroadcaster: ActorRef, julio: ActorRef, ciccio: Act
         }
       }
     } ~
-      path("question") {
-        get {
-          respondWithMediaType(`text/html`) {
-            getFromFile("src/main/resources/html/index.html")
-          }
+      pathPrefix("question") {
+        pathEnd {
+          get {
+            respondWithMediaType(`text/html`) {
+              getFromFile("src/main/resources/html/index.html")
+            }
+          } ~
+            post {
+              formFields('question, 'answerA, 'answerB, 'answerC, 'answerD, 'correct) {
+                (question, answerA, answerB, answerC, answerD, correct) =>
+                  val broadcastQuestion = questionFromFields(question, answerA, answerB, answerC, answerD, correct)
+                  clusterBroadcaster ! broadcastQuestion
+                  redirect("question/result", StatusCodes.SeeOther)
+              }
+            }
         } ~
-          post {
-            formFields('question, 'answerA, 'answerB, 'answerC, 'answerD, 'correct) {
-              (question, answerA, answerB, answerC, answerD, correct) =>
-                val broadcastQuestion = questionFromFields(question, answerA, answerB, answerC, answerD, correct)
-                clusterBroadcaster ! broadcastQuestion
-                complete("{ 'result': 'ok' }")
+          path("result") {
+            get {
+              respondWithMediaType(`text/html`) {
+                getFromFile("src/main/resources/html/result.html")
+              }
             }
           }
       } ~
