@@ -69,14 +69,16 @@ class PubQuizResource(clusterBroadcaster: ActorRef, julio: ActorRef)
               }
             }
           }
-        } ~
-        post {
-          formFields('answer) {
-            (answer) =>
-              julio ! Answer(answer)
-              complete("{ 'result': 'ok' }")
-          }
         }
+      } ~
+      path("answer") {
+          post {
+            formFields('answer) {
+              (answer) =>
+                julio ! Answer(answer)
+                complete("{ 'result': 'ok' }")
+            }
+          }
       }
 
   def choicesToJson(choices: Seq[String]): String = {
