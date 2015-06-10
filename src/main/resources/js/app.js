@@ -1,7 +1,7 @@
 $( document ).ready(function() {
     $('#answerForm').hide();
 
-    var tid = setInterval(pollQuestion, 4000);
+    var tid = setInterval(pollQuestion, 800);
     function pollQuestion() {
       $.get("/quiz/question", function( data ) {
         if(data.question) {
