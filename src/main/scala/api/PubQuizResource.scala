@@ -5,6 +5,7 @@ import akka.pattern.ask
 import akka.util.Timeout
 import cluster.ClusterBroadcaster
 import spray.http.MediaTypes._
+import spray.http.StatusCodes
 import spray.httpx.SprayJsonSupport
 import spray.httpx.marshalling.MetaMarshallers
 import spray.json.{DefaultJsonProtocol, _}
@@ -39,10 +40,12 @@ class PubQuizResource(clusterBroadcaster: ActorRef, julio: ActorRef, ciccio: Act
   }
 
   val route =
-    path("app.js") {
+    pathPrefix("js") {
       get {
-        respondWithMediaType(`application/javascript`) {
-          getFromFile("src/main/resources/js/app.js")
+        path(RestPath) {
+          file => respondWithMediaType(`application/javascript`) {
+            getFromFile(s"src/main/resources/js/$file")
+          }
         }
       }
     } ~
@@ -73,20 +76,27 @@ class PubQuizResource(clusterBroadcaster: ActorRef, julio: ActorRef, ciccio: Act
         }
       } ~
       path("answer") {
-        post {
-          formFields('answer) {
-            (answer) =>
-              julio ! Answer(answer)
-              complete("{ 'result': 'ok' }")
+        get {
+          respondWithMediaType(`text/html`) {
+            getFromFile("src/main/resources/html/answer.html")
           }
         } ~
-          get {
-            respondWithMediaType(`application/json`) {
-              complete {
-                (ciccio ? PullResults).mapTo[Option[Results]].map { optionalResults =>
-                  optionalResults.fold("{}")(results =>
-                    s"""{"question": "${results.question}", "answers": ${resultAnswersToJson(results.answers)}}"""
-                  )
+          post {
+            formFields('answer) {
+              (answer) =>
+                julio ! Answer(answer)
+                redirect("answer", StatusCodes.SeeOther)
+            }
+          } ~
+          path("result") {
+            get {
+              respondWithMediaType(`application/json`) {
+                complete {
+                  (ciccio ? PullResults).mapTo[Option[Results]].map { optionalResults =>
+                    optionalResults.fold("{}")(results =>
+                      s"""{"question": "${results.question}", "answers": ${resultAnswersToJson(results.answers)}}"""
+                    )
+                  }
                 }
               }
             }
