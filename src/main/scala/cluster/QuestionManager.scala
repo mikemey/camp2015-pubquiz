@@ -38,7 +38,7 @@ class QuestionManager(question: String, correctAnswer: String, expiresInMinutes:
       val senderAddress = sender.path.address.toString
       log.info(s"received answer from $senderAddress - '$value'")
 
-      recordedAnswers + (senderAddress -> (value == correctAnswer))
+      recordedAnswers += (senderAddress -> (value == correctAnswer))
       finishIfGameIsOver()
 
     case s => log.warning("QuestionManager - Unknown message: " + s)
@@ -51,7 +51,7 @@ class QuestionManager(question: String, correctAnswer: String, expiresInMinutes:
       (quizStartTime + expirationInMillis).compareTo(DateTime.now) > 0
     }
     if (recordedAnswers.size >= participants.size || timesUp) {
-      broadcastResults(Results(question, Map() ++ recordedAnswers))
+      broadcastResults(Results(question, recordedAnswers.toMap))
       context.stop(self)
     } else Unit
 
