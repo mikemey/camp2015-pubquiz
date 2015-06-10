@@ -24,8 +24,8 @@ class PubQuizResource(clusterBroadcaster: ActorRef, julio: ActorRef, ciccio: Act
   implicit val answerFormat = jsonFormat2(Choice)
   implicit val broadcastQuestionFormat = jsonFormat2(BroadcastQuestion)
   implicit val questionUiFormat = jsonFormat2(UIQuestion)
-  implicit val resultsFormat = jsonFormat2(Results)
-  implicit val localResultsFormat = jsonFormat2(LocalResults)
+  implicit val uiResultFormat = jsonFormat2(UIResult)
+  implicit val uiResultsFormat = jsonFormat3(UIResults)
 
   implicit val timeout = Timeout(5 seconds)
 
@@ -96,7 +96,11 @@ class PubQuizResource(clusterBroadcaster: ActorRef, julio: ActorRef, ciccio: Act
               respondWithMediaType(`application/json`) {
                 complete {
                   (ciccio ? PullResults).mapTo[Option[LocalResults]].map { optionalResults =>
-                    optionalResults.toJson.prettyPrint
+                    val uiResults = optionalResults.map{ r =>
+                      val uiResults = r.results.answers.map{case (id, isCorrect) => UIResult(id, isCorrect)}.toSeq
+                      UIResults(r.results.question, uiResults, r.localIsWinner)
+                    }
+                    uiResults.toJson.prettyPrint
                   }
                 }
               }
