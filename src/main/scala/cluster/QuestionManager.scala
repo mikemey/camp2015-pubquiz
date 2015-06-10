@@ -6,6 +6,9 @@ import akka.cluster.{Cluster, Member}
 import cluster.ClusterBroadcaster.{Answer, Results}
 import spray.http.DateTime
 
+import scala.collection.JavaConverters._
+
+
 class QuestionManager(question: String, correctAnswer: String, expiresInMinutes: Int, var participants: Seq[Member]) extends Actor with ActorLogging {
   val cluster = Cluster(context.system)
   var recordedAnswers: collection.mutable.Map[String, Boolean] = collection.mutable.Map()
@@ -50,9 +53,17 @@ class QuestionManager(question: String, correctAnswer: String, expiresInMinutes:
       (quizStartTime + expirationInMillis).compareTo(DateTime.now) > 0
     }
     if (recordedAnswers.size == participants.size || timesUp) {
-      context.actorSelection("/user/ciccio") ! Results(question, Map() ++ recordedAnswers)
+      broadcastResults(Results(question, Map() ++ recordedAnswers))
       context.stop(self)
     } else Unit
 
+  }
+
+  private def broadcastResults(results: Results) = {
+    participants.foreach { member =>
+      val remoteCiccio = cluster.system.actorSelection(s"${member.address.toString}/user/ciccio")
+      println(s"sending results $results \nto member ${remoteCiccio}")
+      remoteCiccio ! results
+    }
   }
 }

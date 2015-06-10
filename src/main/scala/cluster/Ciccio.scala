@@ -1,12 +1,10 @@
 package cluster
 
 import akka.actor.{Actor, ActorLogging}
-import akka.cluster.Cluster
 import cluster.ClusterBroadcaster._
 
 class Ciccio extends Actor with ActorLogging {
 
-  val cluster = Cluster(context.system)
   var results: Results = null
 
   override def receive: Receive = {
