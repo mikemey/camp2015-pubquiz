@@ -46,9 +46,9 @@ class QuestionManager(question: String, correctAnswer: String, expiresInMinutes:
 
 
   private def finishIfGameIsOver(): Unit = {
-    def timesUp = {
-      val expirationInMillis = expiresInMinutes * 60000
-      (quizStartTime + expirationInMillis).compareTo(DateTime.now) > 0
+    def timesUp = { false
+//      val expirationInMillis = expiresInMinutes * 60000
+//      (quizStartTime + expirationInMillis).compareTo(DateTime.now) > 0
     }
     if (recordedAnswers.size >= participants.size || timesUp) {
       broadcastResults(Results(question, recordedAnswers.toMap))
