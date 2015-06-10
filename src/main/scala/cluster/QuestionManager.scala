@@ -57,10 +57,13 @@ class QuestionManager(question: String, correctAnswer: String, expiresInMinutes:
 
   }
 
-  private def broadcastResults(results: Results) = participants.foreach { member =>
+  private def broadcastResults(results: Results) = {
+    participants.foreach { member =>
       val remoteCiccio = cluster.system.actorSelection(s"${member.address.toString}/user/ciccio")
       println(s"sending results $results \nto member ${remoteCiccio}")
       remoteCiccio ! results
+    }
+    context.actorSelection("/user/ciccio") ! results
   }
 
 }
