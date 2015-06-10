@@ -3,7 +3,7 @@ package cluster
 import akka.actor._
 import cluster.QuizMessages.{Answer, PullQuestion, Question}
 
-class Julio extends Actor with ActorLogging {
+class Julio(participantName: String) extends Actor with ActorLogging {
 
   var question: Question = null
 
@@ -16,10 +16,11 @@ class Julio extends Actor with ActorLogging {
       sender() ! Option(question)
 
     case answer: Answer =>
-      Option(question).foreach(_.respondTo ! answer)
+      Option(question).foreach(_.respondTo ! answer.copy(participantName = participantName))
       question = null
 
     case "Lavate JULIO!" =>
+      log.info(s"Participant name is $participantName")
       log.info("Tengo que lavarme tio! Hoy no, manana!")
 
     case _ =>

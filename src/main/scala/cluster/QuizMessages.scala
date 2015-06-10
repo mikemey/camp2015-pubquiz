@@ -14,11 +14,13 @@ object QuizMessages {
 
   case class Question(question: String, choices: Seq[String], respondTo: ActorRef)
 
-  case class Answer(value: String)
+  case class Answer(value: String, participantName: String = "")
 
   case object PullQuestion
 
-  case class Results(question: String, answers: Map[String, Boolean])
+  case class AnswerResult(ipAddress: String, participantName: String, isCorrect: Boolean)
+
+  case class Results(question: String, answers: Seq[AnswerResult])
 
   case class LocalResults(results: Results, localIsWinner: Boolean)
 
