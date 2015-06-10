@@ -2,9 +2,9 @@ package cluster
 
 import akka.actor._
 import akka.cluster.Cluster
-import cluster.ClusterBroadcaster.{DefaultQuestionExpirationInMinutes, Question}
+import cluster.QuizMessages.{DefaultQuestionExpirationInMinutes, Question}
 
-object ClusterBroadcaster {
+object QuizMessages {
 
   val DefaultQuestionExpirationInMinutes: Int = 2
 
@@ -20,13 +20,14 @@ object ClusterBroadcaster {
 
   case class Results(question: String, answers: Map[String, Boolean])
 
-  case object PullResults
+  case class LocalResults(results: Results, localIsWinner: Boolean)
 
+  case object PullResults
 }
 
 class ClusterBroadcaster extends Actor with ActorLogging {
 
-  import ClusterBroadcaster.BroadcastQuestion
+  import QuizMessages.BroadcastQuestion
 
   import scala.collection.JavaConverters._
 

@@ -1,7 +1,7 @@
 package api
 
 import akka.actor.{Actor, ActorContext, Props}
-import cluster.{Ciccio, ClusterBroadcaster, Julio}
+import cluster.{ClusterBroadcaster, Ciccio, QuizMessages, Julio}
 import spray.routing._
 
 class RoutedHttpService extends Actor with HttpService {

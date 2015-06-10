@@ -1,7 +1,7 @@
 import akka.actor.{ActorSystem, Props}
 import akka.io.IO
 import api.RoutedHttpService
-import cluster.{Ciccio, ClusterBroadcaster, Julio}
+import cluster.{Ciccio, QuizMessages, Julio}
 import com.typesafe.config.ConfigFactory
 import spray.can.Http
 

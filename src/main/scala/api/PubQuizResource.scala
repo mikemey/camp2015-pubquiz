@@ -3,7 +3,7 @@ package api
 import akka.actor.{ActorRef, ActorRefFactory}
 import akka.pattern.ask
 import akka.util.Timeout
-import cluster.ClusterBroadcaster
+import cluster.QuizMessages
 import spray.http.MediaTypes._
 import spray.http.StatusCodes
 import spray.httpx.SprayJsonSupport
@@ -19,7 +19,7 @@ class PubQuizResource(clusterBroadcaster: ActorRef, julio: ActorRef, ciccio: Act
                      (implicit settings: RoutingSettings, resolver: ContentTypeResolver, refFactory: ActorRefFactory)
   extends Directives with DefaultJsonProtocol with SprayJsonSupport with MetaMarshallers {
 
-  import ClusterBroadcaster._
+  import QuizMessages._
   import PubQuizResource._
 
   implicit val answerFormat = jsonFormat2(Choice)

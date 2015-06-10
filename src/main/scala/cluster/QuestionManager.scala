@@ -3,7 +3,7 @@ package cluster
 import akka.actor.{Actor, ActorLogging}
 import akka.cluster.ClusterEvent._
 import akka.cluster.{Cluster, Member}
-import cluster.ClusterBroadcaster.{Answer, Results}
+import cluster.QuizMessages.{Answer, Results}
 import spray.http.DateTime
 
 

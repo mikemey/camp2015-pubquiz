@@ -1,19 +1,26 @@
 package cluster
 
 import akka.actor.{Actor, ActorLogging}
-import cluster.ClusterBroadcaster._
+import cluster.QuizMessages._
+
 
 class Ciccio extends Actor with ActorLogging {
 
-  var results: Results = null
+  var results: Option[Results] = None
 
   override def receive: Receive = {
 
     case results: Results =>
-      this.results = results
+      this.results = Some(results)
 
     case PullResults =>
-      sender() ! Option(results)
+      val msg: Option[LocalResults] = results map { r =>
+        val localAddress = context.self.path.address.toString
+        val isLocalNodeWinner = r.answers.getOrElse(localAddress, false)
+        LocalResults(r, isLocalNodeWinner)
+      }
+
+      sender() ! msg
 
     case "System is started! Tell Julio!" =>
       log.info("Julio tiene que lavarse")
