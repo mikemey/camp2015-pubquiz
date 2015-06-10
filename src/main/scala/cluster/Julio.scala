@@ -15,10 +15,14 @@ class Julio extends Actor with ActorLogging {
     case PullQuestion =>
       sender() ! Option(question)
 
-    case answer: Answer => Option(question).foreach(_.respondTo ! answer)
+    case answer: Answer =>
+      Option(question).foreach(_.respondTo ! answer)
+      question = null
 
-    case "Lavate JULIO!" => log.info("Tengo que lavarme tio! Hoy no, manana!")
+    case "Lavate JULIO!" =>
+      log.info("Tengo que lavarme tio! Hoy no, manana!")
 
-    case _ => log.warning("Julio - Unknown message")
+    case _ =>
+      log.warning("Julio - Unknown message")
   }
 }
