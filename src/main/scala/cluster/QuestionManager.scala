@@ -35,7 +35,7 @@ class QuestionManager(question: String, correctAnswer: String, expiresInMinutes:
 
     case Answer(value) =>
       val senderAddress = sender.path.address.toString
-      log.info(s"received answer from ${senderAddress} - '${value}'")
+      log.info(s"received answer from $senderAddress - '$value'")
 
       recordedAnswers + (senderAddress -> (value == correctAnswer))
       finishIfGameIsOver()

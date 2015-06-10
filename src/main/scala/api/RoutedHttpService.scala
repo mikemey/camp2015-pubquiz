@@ -15,5 +15,5 @@ class RoutedHttpService extends Actor with HttpService {
   ciccio ! "System is started! Tell Julio!"
 
   def receive: Receive =
-    runRoute(new PubQuizResource(clusterBroadcaster, julio).route)
+    runRoute(new PubQuizResource(clusterBroadcaster, julio, ciccio).route)
 }

@@ -14,7 +14,7 @@ import spray.routing.{Directives, RoutingSettings}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 
-class PubQuizResource(clusterBroadcaster: ActorRef, julio: ActorRef)
+class PubQuizResource(clusterBroadcaster: ActorRef, julio: ActorRef, ciccio: ActorRef)
                      (implicit settings: RoutingSettings, resolver: ContentTypeResolver, refFactory: ActorRefFactory)
   extends Directives with DefaultJsonProtocol with SprayJsonSupport with MetaMarshallers {
 
@@ -72,16 +72,32 @@ class PubQuizResource(clusterBroadcaster: ActorRef, julio: ActorRef)
         }
       } ~
       path("answer") {
-          post {
-            formFields('answer) {
-              (answer) =>
-                julio ! Answer(answer)
-                complete("{ 'result': 'ok' }")
+        post {
+          formFields('answer) {
+            (answer) =>
+              julio ! Answer(answer)
+              complete("{ 'result': 'ok' }")
+          }
+        } ~
+          get {
+            respondWithMediaType(`application/json`) {
+              complete {
+                (ciccio ? PullResults).mapTo[Option[Results]].map { optionalResults =>
+                  optionalResults.fold("{}")(results =>
+                    s"""{"question": "${results.question}", "answers": ${resultAnswersToJson(results.answers)}}"""
+                  )
+                }
+              }
             }
           }
       }
 
   def choicesToJson(choices: Seq[String]): String = {
     "[" + choices.map(c => s""" "$c" """).mkString(",") + "]"
+  }
+
+
+  def resultAnswersToJson(answers: Map[String, Boolean]): String = {
+    "{" + answers.map{case (actor, result) => s""" "$actor" : $result """}.mkString(",") + "}"
   }
 }
