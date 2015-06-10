@@ -103,6 +103,7 @@ class PubQuizResource(clusterBroadcaster: ActorRef, julio: ActorRef, ciccio: Act
           }
       }
 
+
   def resultAnswersToJson(answers: Map[String, Boolean]): String = {
     "{" + answers.map { case (actor, result) => s""" "$actor" : $result """ }.mkString(",") + "}"
   }
