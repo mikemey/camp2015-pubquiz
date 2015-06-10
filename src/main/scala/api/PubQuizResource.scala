@@ -5,6 +5,7 @@ import akka.pattern.ask
 import akka.util.Timeout
 import cluster.ClusterBroadcaster
 import spray.http.MediaTypes._
+import spray.http.StatusCodes
 import spray.httpx.SprayJsonSupport
 import spray.httpx.marshalling.MetaMarshallers
 import spray.json.DefaultJsonProtocol
@@ -36,10 +37,12 @@ class PubQuizResource(clusterBroadcaster: ActorRef, julio: ActorRef)
   }
 
   val route =
-    path("app.js") {
+    pathPrefix("js") {
       get {
-        respondWithMediaType(`application/javascript`) {
-          getFromFile("src/main/resources/js/app.js")
+        path(RestPath) {
+          file => respondWithMediaType(`application/javascript`) {
+            getFromFile(s"src/main/resources/js/$file")
+          }
         }
       }
     } ~
@@ -72,13 +75,18 @@ class PubQuizResource(clusterBroadcaster: ActorRef, julio: ActorRef)
         }
       } ~
       path("answer") {
-          post {
-            formFields('answer) {
-              (answer) =>
-                julio ! Answer(answer)
-                complete("{ 'result': 'ok' }")
-            }
+        get {
+          respondWithMediaType(`text/html`) {
+            getFromFile("src/main/resources/html/answer.html")
           }
+        } ~
+        post {
+          formFields('answer) {
+            (answer) =>
+              julio ! Answer(answer)
+              redirect("answer", StatusCodes.SeeOther)
+          }
+        }
       }
 
   def choicesToJson(choices: Seq[String]): String = {
