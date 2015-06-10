@@ -15,7 +15,7 @@ class Ciccio extends Actor with ActorLogging {
 
     case PullResults =>
       val msg: Option[LocalResults] = results map { r =>
-        val localAddress = context.self.path.address.toString
+        val localAddress = akka.cluster.Cluster(context.system).selfAddress.toString
         val isLocalNodeWinner = r.answers.getOrElse(localAddress, false)
         LocalResults(r, isLocalNodeWinner)
       }

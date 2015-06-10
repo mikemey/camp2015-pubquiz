@@ -19,6 +19,7 @@ $( document ).ready(function() {
 
     function showResult(data) {
         $('#spinner').hide();
+        alert(data.localIsWinner);
         if( data.localIsWinner ) {
             $('#correct').show();
         } else {
@@ -32,6 +33,7 @@ $( document ).ready(function() {
             var result = item.isCorrect ? "correct answer" : "wrong answer";
             $('#results').append("<tr><td>" + item.id + "</td><td>" + result + "</td></tr>")
         });
+        $('#page-title').text('Final results');
         $('#results').show();
     }
 });
