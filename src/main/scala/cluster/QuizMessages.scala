@@ -4,6 +4,8 @@ import akka.actor._
 import akka.cluster.Cluster
 import cluster.QuizMessages.{DefaultQuestionExpirationInMinutes, Question}
 
+import scala.concurrent.duration._
+
 object QuizMessages {
 
   val DefaultQuestionExpirationInMinutes: Int = 2
@@ -25,12 +27,14 @@ object QuizMessages {
   case class LocalResults(results: Results, localIsWinner: Boolean)
 
   case object PullResults
+
+  case object QuestionTimeOut
 }
 
 class ClusterBroadcaster extends Actor with ActorLogging {
 
   import QuizMessages.BroadcastQuestion
-
+  import QuizMessages.QuestionTimeOut
   import scala.collection.JavaConverters._
 
   val cluster = Cluster(context.system)
@@ -49,9 +53,12 @@ class ClusterBroadcaster extends Actor with ActorLogging {
       activeMembers.foreach { member =>
         val remoteJulio = cluster.system.actorSelection(s"${member.address.toString}/user/julio")
         val data = Question(question, choices.map(_.value), questionManager)
-        println(s"sending question ${question} \nto member ${remoteJulio}")
+        println(s"sending question $question \nto member $remoteJulio")
         remoteJulio ! data
       }
+
+      context.system.scheduler.scheduleOnce(DefaultQuestionExpirationInMinutes.minutes, questionManager, QuestionTimeOut)
+
     case _ => log.warning(s"Unknown message")
   }
 }
