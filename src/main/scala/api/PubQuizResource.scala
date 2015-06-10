@@ -107,8 +107,8 @@ class PubQuizResource(clusterBroadcaster: ActorRef, julio: ActorRef, ciccio: Act
                 complete {
                   (ciccio ? PullResults).mapTo[Option[LocalResults]].map { optionalResults =>
                     val uiResults = optionalResults.map{ r =>
-                      val uiResults = r.results.answers.map{answer => UIResult(answer.participantName, answer.isCorrect)}
-                      UIResults(r.results.question, uiResults, r.localIsWinner)
+                      val results = r.results.answers.map{answer => UIResult(answer.participantName, answer.isCorrect)}
+                      UIResults(r.results.question, results, r.localIsWinner)
                     }
                     uiResults.toJson.prettyPrint
                   }
