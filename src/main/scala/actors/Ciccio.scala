@@ -1,7 +1,7 @@
 package actors
 
-import akka.actor.{Actor, ActorLogging}
 import actors.QuizMessages._
+import akka.actor.{Actor, ActorLogging}
 
 class Ciccio extends Actor with ActorLogging {
 
@@ -20,6 +20,8 @@ class Ciccio extends Actor with ActorLogging {
         LocalResults(r, isLocalNodeWinner)
       }
       sender() ! msg
+
+    case Reset =>
       results = None
 
     case "System is started! Tell Julio!" =>

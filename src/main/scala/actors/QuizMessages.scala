@@ -27,6 +27,8 @@ object QuizMessages {
 
   case object QuestionTimeOut
 
+  case object Reset
+
   implicit val answerFormat = jsonFormat2(Choice)
   implicit val broadcastQuestionFormat = jsonFormat2(BroadcastQuestion)
 

@@ -1,9 +1,9 @@
 package actors
 
+import actors.QuizMessages.{Answer, AnswerResult, QuestionTimeOut, Results}
 import akka.actor.{Actor, ActorLogging}
 import akka.cluster.ClusterEvent._
 import akka.cluster.{Cluster, Member}
-import actors.QuizMessages.{QuestionTimeOut, Answer, AnswerResult, Results}
 import spray.http.DateTime
 
 
@@ -49,13 +49,13 @@ class QuestionManager(question: String, correctAnswer: String, var participants:
     case s => log.warning("QuestionManager - Unknown message: " + s)
   }
 
-
   private def finishIfGameIsOver(): Unit = {
+    val currentResult = Results(question, recordedAnswers.toSeq)
+    context.actorSelection("/user/ciccio") ! currentResult
     if (recordedAnswers.size >= participants.size || timesUp) {
-      broadcastResults(Results(question, recordedAnswers.toSeq))
+      broadcastResults(currentResult)
       context.stop(self)
     } else Unit
-
   }
 
   private def broadcastResults(results: Results) = {
@@ -64,7 +64,6 @@ class QuestionManager(question: String, correctAnswer: String, var participants:
       log.info(s"sending results $results to member $remoteCiccio")
       remoteCiccio ! results
     }
-    context.actorSelection("/user/ciccio") ! results
   }
 
 }
