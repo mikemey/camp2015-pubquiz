@@ -56,9 +56,11 @@ class QuestionManager(question: String, correctAnswer: String, var participants:
   private def finishIfGameIsOver(): Unit = {
     val currentResult = Results(question, recordedAnswers.toSeq)
     println("sending result to local ciccio: " + currentResult)
-    context.actorSelection("/user/ciccio") ! currentResult
+    val localCiccio = context.actorSelection("/user/ciccio")
+    localCiccio ! currentResult
 
     condOpt(() => {
+      localCiccio ! ResultsComplete
       broadcastResults(currentResult)
       context.stop(self)
     }) { case x if timeToStopTheGame => x }.foreach(_.apply())
@@ -66,7 +68,6 @@ class QuestionManager(question: String, correctAnswer: String, var participants:
   }
 
   private def broadcastResults(results: Results) = {
-    context.actorSelection("/user/ciccio") ! ResultsComplete
     participants.foreach { member =>
       val remoteCiccio = cluster.system.actorSelection(s"${member.address.toString}/user/ciccio")
       log.info(s"sending results $results to member $remoteCiccio")
