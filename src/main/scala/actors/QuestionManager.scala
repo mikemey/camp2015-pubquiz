@@ -6,6 +6,8 @@ import akka.cluster.ClusterEvent._
 import akka.cluster.{Cluster, Member}
 import spray.http.DateTime
 
+import scala.PartialFunction.condOpt
+
 
 class QuestionManager(question: String, correctAnswer: String, var participants: Seq[Member]) extends Actor with ActorLogging {
   val cluster = Cluster(context.system)
@@ -56,13 +58,11 @@ class QuestionManager(question: String, correctAnswer: String, var participants:
     println("sending result to local ciccio: " + currentResult)
     context.actorSelection("/user/ciccio") ! currentResult
 
-    timeToStopTheGame  match {
-      case true => {
-        broadcastResults(currentResult)
-        context.stop(self)
-      }
-      case false => Unit
-    }
+    condOpt(() => {
+      broadcastResults(currentResult)
+      context.stop(self)
+    }) { case x if timeToStopTheGame => x }.foreach(_.apply())
+
   }
 
   private def broadcastResults(results: Results) = {
