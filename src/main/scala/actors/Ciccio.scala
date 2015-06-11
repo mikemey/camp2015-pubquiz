@@ -6,13 +6,23 @@ import akka.actor.{Actor, ActorLogging}
 class Ciccio extends Actor with ActorLogging {
 
   var results: Option[Results] = None
+  var counters =  collection.mutable.Map[String, Int]()
   var questionFinished = false
+
+  def incrementCounters(results: Seq[AnswerResult]): Unit = {
+    results.foreach {
+      case AnswerResult(address, _, true) =>
+        val currentCount = counters.getOrElse(address, 0)
+        counters put (address, currentCount+1)
+    }
+  }
 
   override def receive: Receive = {
 
     case results: Results =>
       log.info(s"ciccio received the results: $results")
       this.results = Some(results)
+      incrementCounters(results.answers)
 
     case PullResults =>
       respondWithResults()
