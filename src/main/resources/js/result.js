@@ -23,9 +23,10 @@ $( document ).ready(function() {
 
     function printResults(results) {
         $('#results').empty();
+        $('#results').append("<th><td>Participant</td><td>given answer</td><td>Result</td></tr>")
         $.each(results, function( index, item ) {
             var result = item.isCorrect ? "correct answer" : "wrong answer";
-            $('#results').append("<tr><td>" + item.id + "</td><td>" + result + "</td></tr>")
+            $('#results').append("<tr><td>" + item.id + "</td><td>" + item.answer + "</td><td>" + result + "</td></tr>")
         });
     }
 });
