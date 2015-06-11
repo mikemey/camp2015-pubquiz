@@ -13,6 +13,8 @@ class QuestionManager(question: String, correctAnswer: String, var participants:
   var timesUp = false
   val quizStartTime = DateTime.now
 
+  def timeToStopTheGame = recordedAnswers.size >= participants.size || timesUp
+
   override def preStart(): Unit = {
     cluster.subscribe(self, initialStateMode = InitialStateAsEvents,
       classOf[MemberEvent], classOf[UnreachableMember])
@@ -53,10 +55,14 @@ class QuestionManager(question: String, correctAnswer: String, var participants:
     val currentResult = Results(question, recordedAnswers.toSeq)
     println("sending result to local ciccio: " + currentResult)
     context.actorSelection("/user/ciccio") ! currentResult
-    if (recordedAnswers.size >= participants.size || timesUp) {
-      broadcastResults(currentResult)
-      context.stop(self)
-    } else Unit
+
+    timeToStopTheGame  match {
+      case true => {
+        broadcastResults(currentResult)
+        context.stop(self)
+      }
+      case false => Unit
+    }
   }
 
   private def broadcastResults(results: Results) = {
