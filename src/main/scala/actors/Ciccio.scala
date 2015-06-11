@@ -14,6 +14,7 @@ class Ciccio extends Actor with ActorLogging {
       case AnswerResult(address, _, _, true) =>
         val currentCount = counters.getOrElse(address, 0)
         counters put (address, currentCount+1)
+      case _ => Unit
     }
   }
 
