@@ -15,12 +15,15 @@ class Ciccio extends Actor with ActorLogging {
       this.results = Some(results)
 
     case PullResults =>
-      respondWithResults
+      respondWithResults()
       results = None
 
     case PullPartialResults =>
-      respondWithResults
-      if (questionFinished) results = None
+      respondWithResults()
+      if (questionFinished) {
+        results = None
+        questionFinished = false
+      }
 
     case ResultsComplete =>
       questionFinished = true
