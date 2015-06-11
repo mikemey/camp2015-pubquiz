@@ -1,6 +1,6 @@
 package actors
 
-import actors.QuizMessages.{Answer, PullQuestion, Question, Reset}
+import actors.QuizMessages.{Answer, PullQuestion, Question}
 import akka.actor._
 
 class Julio(participantName: String) extends Actor with ActorLogging {
@@ -11,7 +11,6 @@ class Julio(participantName: String) extends Actor with ActorLogging {
 
     case question: Question =>
       this.question = question
-      context.actorSelection("/user/ciccio") ! Reset
 
     case PullQuestion =>
       sender() ! Option(question)

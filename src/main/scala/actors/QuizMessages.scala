@@ -27,8 +27,6 @@ object QuizMessages {
 
   case object QuestionTimeOut
 
-  case object Reset
-
   case object ResultsComplete
 
   case object ClusterConnected

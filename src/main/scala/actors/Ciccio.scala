@@ -13,6 +13,7 @@ class Ciccio extends Actor with ActorLogging {
     case results: Results =>
       log.info(s"ciccio received the results: $results")
       this.results = Some(results)
+      questionFinished = true
 
     case PullResults =>
       val msg: Option[LocalResults] = results map { r =>
@@ -21,12 +22,10 @@ class Ciccio extends Actor with ActorLogging {
         LocalResults(r, isLocalNodeWinner, questionFinished)
       }
       sender() ! msg
+      if (questionFinished) results = None
 
     case ResultsComplete =>
       questionFinished = true
-
-    case Reset =>
-      results = None
 
     case "System is started! Tell Julio!" =>
       log.info("Julio tiene que lavarse")
@@ -35,5 +34,4 @@ class Ciccio extends Actor with ActorLogging {
     case _ =>
       log.warning("Ciccio - Unknown message")
   }
-
 }

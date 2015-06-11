@@ -54,13 +54,13 @@ class QuestionManager(question: String, correctAnswer: String, var participants:
     println("sending result to local ciccio: " + currentResult)
     context.actorSelection("/user/ciccio") ! currentResult
     if (recordedAnswers.size >= participants.size || timesUp) {
-      context.actorSelection("/user/ciccio") ! ResultsComplete
       broadcastResults(currentResult)
       context.stop(self)
     } else Unit
   }
 
   private def broadcastResults(results: Results) = {
+    context.actorSelection("/user/ciccio") ! ResultsComplete
     participants.foreach { member =>
       val remoteCiccio = cluster.system.actorSelection(s"${member.address.toString}/user/ciccio")
       log.info(s"sending results $results to member $remoteCiccio")
