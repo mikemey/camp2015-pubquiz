@@ -9,7 +9,7 @@ import spray.httpx.SprayJsonSupport
 import spray.httpx.marshalling.MetaMarshallers
 import spray.json.{DefaultJsonProtocol, _}
 import spray.routing.directives.ContentTypeResolver
-import spray.routing.{Directives, RoutingSettings}
+import spray.routing.{Route, Directives, RoutingSettings}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -78,6 +78,11 @@ class PubQuizResource(clusterBroadcaster: ActorRef, julio: ActorRef, ciccio: Act
                 getFromFile("src/main/resources/html/result.html")
               }
             }
+          } ~
+          path("partial") {
+            get {
+              askForResultsWith(PullPartialResults)
+            }
           }
       } ~
       path("quiz" / "question") {
@@ -116,18 +121,22 @@ class PubQuizResource(clusterBroadcaster: ActorRef, julio: ActorRef, ciccio: Act
         } ~
           path("result") {
             get {
-              respondWithMediaType(`application/json`) {
-                complete {
-                  (ciccio ? PullResults).mapTo[Option[LocalResults]].map { optionalResults =>
-                    val uiResults = optionalResults.map { r =>
-                      val results = r.results.answers.map { answer => UIResult(answer.participantName, answer.isCorrect) }
-                      UIResults(r.results.question, results, r.localIsWinner, r.questionFinished)
-                    }
-                    uiResults.toJson.prettyPrint
-                  }
-                }
-              }
+              askForResultsWith(PullResults)
             }
           }
       }
+
+  def askForResultsWith(question: Any): Route = {
+    respondWithMediaType(`application/json`) {
+      complete {
+        (ciccio ? question).mapTo[Option[LocalResults]].map { optionalResults =>
+          val uiResults = optionalResults.map { r =>
+            val results = r.results.answers.map { answer => UIResult(answer.participantName, answer.isCorrect) }
+            UIResults(r.results.question, results, r.localIsWinner, r.questionFinished)
+          }
+          uiResults.toJson.prettyPrint
+        }
+      }
+    }
+  }
 }

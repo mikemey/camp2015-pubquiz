@@ -21,9 +21,11 @@ object QuizMessages {
 
   case class Results(question: String, answers: Seq[AnswerResult])
 
-  case class LocalResults(results: Results, localIsWinner: Boolean, questionFinished: Boolean)
+  case class LocalResults(results: Results, localIsWinner: Boolean, questionFinished: Boolean = false)
 
   case object PullResults
+
+  case object PullPartialResults
 
   case object QuestionTimeOut
 

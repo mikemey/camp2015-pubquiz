@@ -2,7 +2,7 @@ $( document ).ready(function() {
 
     var tid = setInterval(pollQuestion, 800);
     function pollQuestion() {
-      $.get("/answer/result", function( data ) {
+      $.get("/question/partial", function( data ) {
         if(data != null && data.question) {
             if( data.allResults) {
                 abortTimer();
