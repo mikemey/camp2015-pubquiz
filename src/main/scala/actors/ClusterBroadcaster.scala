@@ -1,21 +1,34 @@
 package actors
 
+import actors.QuizMessages.{ClusterConnected, DefaultQuestionExpirationInMinutes, Question}
 import akka.actor._
 import akka.cluster.Cluster
-import actors.QuizMessages.{DefaultQuestionExpirationInMinutes, Question}
-import scala.concurrent.ExecutionContext.Implicits.global
+import akka.cluster.ClusterEvent.{InitialStateAsEvents, MemberUp}
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 
 class ClusterBroadcaster extends Actor with ActorLogging {
 
-  import QuizMessages.BroadcastQuestion
-  import QuizMessages.QuestionTimeOut
+  import QuizMessages.{BroadcastQuestion, QuestionTimeOut}
+
   import scala.collection.JavaConverters._
 
   val cluster = Cluster(context.system)
+  var connected = false
+
+  override def preStart(): Unit = {
+    cluster.subscribe(self, initialStateMode = InitialStateAsEvents, classOf[MemberUp])
+  }
 
   def receive = {
+    case MemberUp(member) =>
+      if (cluster.selfUniqueAddress == member.uniqueAddress) {
+        connected = true
+      }
+
+    case ClusterConnected => sender() ! connected
+      
     case BroadcastQuestion(question, choices) =>
 
       val correctAnswer = choices.find(_.isCorrect).getOrElse(throw new RuntimeException("There must be a correct choice")).value

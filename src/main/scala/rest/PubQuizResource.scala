@@ -12,6 +12,7 @@ import spray.routing.directives.ContentTypeResolver
 import spray.routing.{Directives, RoutingSettings}
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 import scala.concurrent.duration._
 
 class PubQuizResource(clusterBroadcaster: ActorRef, julio: ActorRef, ciccio: ActorRef)
@@ -44,21 +45,32 @@ class PubQuizResource(clusterBroadcaster: ActorRef, julio: ActorRef, ciccio: Act
         }
       }
     } ~
+      pathSingleSlash {
+        get {
+          respondWithMediaType(`text/html`) {
+            getFromFile("src/main/resources/html/index.html")
+          }
+        }
+      } ~
+      path("connected") {
+        get {
+          complete {
+            (clusterBroadcaster ? ClusterConnected).mapTo[Boolean].map { connected =>
+              s"""{ "connected": "$connected" }"""
+            }
+          }
+        }
+      } ~
       pathPrefix("question") {
         pathEnd {
-          get {
-            respondWithMediaType(`text/html`) {
-              getFromFile("src/main/resources/html/index.html")
+          post {
+            formFields('question, 'answerA, 'answerB, 'answerC, 'answerD, 'correct) {
+              (question, answerA, answerB, answerC, answerD, correct) =>
+                val broadcastQuestion = questionFromFields(question, answerA, answerB, answerC, answerD, correct)
+                clusterBroadcaster ! broadcastQuestion
+                redirect("question/result", StatusCodes.SeeOther)
             }
-          } ~
-            post {
-              formFields('question, 'answerA, 'answerB, 'answerC, 'answerD, 'correct) {
-                (question, answerA, answerB, answerC, answerD, correct) =>
-                  val broadcastQuestion = questionFromFields(question, answerA, answerB, answerC, answerD, correct)
-                  clusterBroadcaster ! broadcastQuestion
-                  redirect("question/result", StatusCodes.SeeOther)
-              }
-            }
+          }
         } ~
           path("result") {
             get {
@@ -72,8 +84,16 @@ class PubQuizResource(clusterBroadcaster: ActorRef, julio: ActorRef, ciccio: Act
         get {
           respondWithMediaType(`application/json`) {
             complete {
-              (julio ? PullQuestion).mapTo[Option[Question]].map { optionalQuestion =>
-                optionalQuestion.map(q => UIQuestion(q.question, q.choices)).toJson.prettyPrint
+              (clusterBroadcaster ? ClusterConnected).mapTo[Boolean].flatMap { connected =>
+                if (connected) {
+                  (julio ? PullQuestion).mapTo[Option[Question]].map { optionalQuestion =>
+                    optionalQuestion
+                      .map(q => UIQuestion(q.question, q.choices).toJson.prettyPrint)
+                      .getOrElse(UIConnected(true).toJson.prettyPrint)
+                  }
+                } else {
+                  Future.successful(UIConnected(false).toJson.prettyPrint)
+                }
               }
             }
           }

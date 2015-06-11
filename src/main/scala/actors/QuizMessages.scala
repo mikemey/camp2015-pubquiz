@@ -31,6 +31,8 @@ object QuizMessages {
 
   case object ResultsComplete
 
+  case object ClusterConnected
+
   implicit val answerFormat = jsonFormat2(Choice)
   implicit val broadcastQuestionFormat = jsonFormat2(BroadcastQuestion)
 

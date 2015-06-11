@@ -10,8 +10,11 @@ object UIModel {
 
   case class UIResults(question: String, results: Seq[UIResult], localIsWinner: Boolean, allResults: Boolean)
 
+  case class UIConnected(connected: Boolean)
+
   implicit val questionUiFormat = jsonFormat2(UIQuestion)
   implicit val uiResultFormat = jsonFormat2(UIResult)
   implicit val uiResultsFormat = jsonFormat4(UIResults)
+  implicit val uiConnectedFormat = jsonFormat1(UIConnected)
 
 }
