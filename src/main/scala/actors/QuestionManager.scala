@@ -43,7 +43,7 @@ class QuestionManager(question: String, correctAnswer: String, var participants:
       val senderAddress = sender().path.address.toString
       log.info(s"received answer from $senderAddress - '$value'")
 
-      val result: AnswerResult = AnswerResult(senderAddress, participantName, value == correctAnswer)
+      val result: AnswerResult = AnswerResult(senderAddress, participantName, value, value == correctAnswer)
       recordedAnswers += result
       finishIfGameIsOver()
 

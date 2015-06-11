@@ -4,11 +4,12 @@ $( document ).ready(function() {
     var tid = setInterval(pollQuestion, 800);
     function pollQuestion() {
       $.get("/quiz/question", function( data ) {
-        if(data != null) {
-          if(data.question) {
+        if(data != null && data.question) {
            abortTimer();
-           swapForms(data);
-          }
+           showQuestionForm(data);
+        } else {
+            $('#questionForm').show();
+            $('#answerForm').hide();
         }
       });
     }
@@ -17,7 +18,7 @@ $( document ).ready(function() {
       clearInterval(tid);
     }
 
-    function swapForms(data) {
+    function showQuestionForm(data) {
         $('#curQuestion').text(data.question);
         setAnswer('#curAnswerA', data.answers[0]);
         setAnswer('#curAnswerB', data.answers[1]);

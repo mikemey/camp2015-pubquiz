@@ -17,7 +17,7 @@ object QuizMessages {
 
   case object PullQuestion
 
-  case class AnswerResult(ipAddress: String, participantName: String, isCorrect: Boolean)
+  case class AnswerResult(ipAddress: String, participantName: String, answerValue: String, isCorrect: Boolean)
 
   case class Results(question: String, answers: Seq[AnswerResult])
 
