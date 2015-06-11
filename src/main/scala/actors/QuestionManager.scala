@@ -1,6 +1,6 @@
 package actors
 
-import actors.QuizMessages.{Answer, AnswerResult, QuestionTimeOut, Results}
+import actors.QuizMessages._
 import akka.actor.{Actor, ActorLogging}
 import akka.cluster.ClusterEvent._
 import akka.cluster.{Cluster, Member}
@@ -51,8 +51,10 @@ class QuestionManager(question: String, correctAnswer: String, var participants:
 
   private def finishIfGameIsOver(): Unit = {
     val currentResult = Results(question, recordedAnswers.toSeq)
+    println("sending result to local ciccio: " + currentResult)
     context.actorSelection("/user/ciccio") ! currentResult
     if (recordedAnswers.size >= participants.size || timesUp) {
+      context.actorSelection("/user/ciccio") ! ResultsComplete
       broadcastResults(currentResult)
       context.stop(self)
     } else Unit

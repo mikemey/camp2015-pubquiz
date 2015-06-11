@@ -6,6 +6,7 @@ import akka.actor.{Actor, ActorLogging}
 class Ciccio extends Actor with ActorLogging {
 
   var results: Option[Results] = None
+  var questionFinished: Boolean = false
 
   override def receive: Receive = {
 
@@ -17,9 +18,12 @@ class Ciccio extends Actor with ActorLogging {
       val msg: Option[LocalResults] = results map { r =>
         val localAddress = akka.cluster.Cluster(context.system).selfAddress.toString
         val isLocalNodeWinner = r.answers.exists(answer => answer.ipAddress == localAddress && answer.isCorrect)
-        LocalResults(r, isLocalNodeWinner)
+        LocalResults(r, isLocalNodeWinner, questionFinished)
       }
       sender() ! msg
+
+    case ResultsComplete =>
+      questionFinished = true
 
     case Reset =>
       results = None

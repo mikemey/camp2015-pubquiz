@@ -8,10 +8,10 @@ object UIModel {
 
   case class UIResult(id: String, isCorrect: Boolean)
 
-  case class UIResults(question: String, results: Seq[UIResult], localIsWinner: Boolean)
+  case class UIResults(question: String, results: Seq[UIResult], localIsWinner: Boolean, allResults: Boolean)
 
   implicit val questionUiFormat = jsonFormat2(UIQuestion)
   implicit val uiResultFormat = jsonFormat2(UIResult)
-  implicit val uiResultsFormat = jsonFormat3(UIResults)
+  implicit val uiResultsFormat = jsonFormat4(UIResults)
 
 }

@@ -4,8 +4,11 @@ $( document ).ready(function() {
     function pollQuestion() {
       $.get("/answer/result", function( data ) {
         if(data != null && data.question) {
-           abortTimer();
-           showResult(data);
+            if( data.allResults) {
+                abortTimer();
+                $('#spinner').hide();
+            }
+            showResult(data);
         }
       });
     }
@@ -15,11 +18,11 @@ $( document ).ready(function() {
     }
 
     function showResult(data) {
-        $('#spinner').hide();
         printResults(data.results);
     }
 
     function printResults(results) {
+        $('#results').empty();
         $.each(results, function( index, item ) {
             var result = item.isCorrect ? "correct answer" : "wrong answer";
             $('#results').append("<tr><td>" + item.id + "</td><td>" + result + "</td></tr>")

@@ -21,13 +21,15 @@ object QuizMessages {
 
   case class Results(question: String, answers: Seq[AnswerResult])
 
-  case class LocalResults(results: Results, localIsWinner: Boolean)
+  case class LocalResults(results: Results, localIsWinner: Boolean, questionFinished: Boolean)
 
   case object PullResults
 
   case object QuestionTimeOut
 
   case object Reset
+
+  case object ResultsComplete
 
   implicit val answerFormat = jsonFormat2(Choice)
   implicit val broadcastQuestionFormat = jsonFormat2(BroadcastQuestion)
