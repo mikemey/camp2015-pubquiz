@@ -23,7 +23,7 @@ $( document ).ready(function() {
 
     function printResults(results) {
         $('#results').empty();
-        $('#results').append("<th><td>Participant</td><td>given answer</td><td>Result</td><td>Score</td></tr>")
+        $('#results').append("<th><td>Participant</td><td>given answer</td><td>Result</td><td>Score</td></th>")
         $.each(results, function( index, item ) {
             var result = item.isCorrect ? "correct answer" : "wrong answer";
             $('#results').append("<tr><td>" + item.id + "</td><td>" + item.answer + "</td><td>" + result + "</td><td>" + item.countOfValidAnswers + "</td></tr>")
