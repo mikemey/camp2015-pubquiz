@@ -11,7 +11,7 @@ class Ciccio extends Actor with ActorLogging {
 
   def incrementCounters(results: Seq[AnswerResult]): Unit = {
     results.foreach {
-      case AnswerResult(address, _, true) =>
+      case AnswerResult(address, _, _, true) =>
         val currentCount = counters.getOrElse(address, 0)
         counters put (address, currentCount+1)
     }
@@ -50,7 +50,7 @@ class Ciccio extends Actor with ActorLogging {
     val msg: Option[LocalResults] = results map { r =>
       val localAddress = akka.cluster.Cluster(context.system).selfAddress.toString
       val isLocalNodeWinner = r.answers.exists(answer => answer.ipAddress == localAddress && answer.isCorrect)
-      LocalResults(r, isLocalNodeWinner, questionFinished)
+      LocalResults(r, isLocalNodeWinner, questionFinished, counters.toMap)
     }
     sender() ! msg
   }

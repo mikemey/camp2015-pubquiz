@@ -21,7 +21,7 @@ object QuizMessages {
 
   case class Results(question: String, answers: Seq[AnswerResult])
 
-  case class LocalResults(results: Results, localIsWinner: Boolean, questionFinished: Boolean = false)
+  case class LocalResults(results: Results, localIsWinner: Boolean, questionFinished: Boolean = false, counters: Map[String, Int])
 
   case object PullResults
 
