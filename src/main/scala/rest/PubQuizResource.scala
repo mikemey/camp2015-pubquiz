@@ -14,6 +14,7 @@ import spray.routing.{Route, Directives, RoutingSettings}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.concurrent.duration._
+import scala.util.Success
 
 class PubQuizResource(clusterBroadcaster: ActorRef, julio: ActorRef, ciccio: ActorRef)
                      (implicit settings: RoutingSettings, resolver: ContentTypeResolver, refFactory: ActorRefFactory)
@@ -47,17 +48,9 @@ class PubQuizResource(clusterBroadcaster: ActorRef, julio: ActorRef, ciccio: Act
     } ~
       pathSingleSlash {
         get {
-          respondWithMediaType(`text/html`) {
-            getFromFile("src/main/resources/html/index.html")
-          }
-        }
-      } ~
-      path("connected") {
-        get {
-          complete {
-            (clusterBroadcaster ? ClusterConnected).mapTo[Boolean].map { connected =>
-              s"""{ "connected": "$connected" }"""
-            }
+          onSuccess((clusterBroadcaster ? ClusterConnected).mapTo[Boolean]) { connected =>
+            val file = if (connected) "index.html" else "waitforcluster.html"
+            getFromFile(s"src/main/resources/html/$file")
           }
         }
       } ~
@@ -89,16 +82,8 @@ class PubQuizResource(clusterBroadcaster: ActorRef, julio: ActorRef, ciccio: Act
         get {
           respondWithMediaType(`application/json`) {
             complete {
-              (clusterBroadcaster ? ClusterConnected).mapTo[Boolean].flatMap { connected =>
-                if (connected) {
-                  (julio ? PullQuestion).mapTo[Option[Question]].map { optionalQuestion =>
-                    optionalQuestion
-                      .map(q => UIQuestion(q.question, q.choices).toJson.prettyPrint)
-                      .getOrElse(UIConnected(true).toJson.prettyPrint)
-                  }
-                } else {
-                  Future.successful(UIConnected(false).toJson.prettyPrint)
-                }
+              (julio ? PullQuestion).mapTo[Option[Question]].map { optionalQuestion =>
+                optionalQuestion.map(q => UIQuestion(q.question, q.choices)).toJson.prettyPrint
               }
             }
           }

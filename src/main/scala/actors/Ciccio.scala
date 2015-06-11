@@ -33,7 +33,7 @@ class Ciccio extends Actor with ActorLogging {
       log.warning("Ciccio - Unknown message")
   }
 
-  def respondWithResults: Unit = {
+  def respondWithResults(): Unit = {
     val msg: Option[LocalResults] = results map { r =>
       val localAddress = akka.cluster.Cluster(context.system).selfAddress.toString
       val isLocalNodeWinner = r.answers.exists(answer => answer.ipAddress == localAddress && answer.isCorrect)

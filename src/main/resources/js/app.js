@@ -1,15 +1,10 @@
 $( document ).ready(function() {
     $('#answerForm').hide();
-    $('#questionForm').hide();
 
     var tid = setInterval(pollQuestion, 800);
     function pollQuestion() {
       $.get("/quiz/question", function( data ) {
         if(data != null) {
-          if(data.connected) {
-            $('#waiting').hide();
-            $('#questionForm').show();
-          }
           if(data.question) {
            abortTimer();
            swapForms(data);
