@@ -1,7 +1,7 @@
 import akka.actor.{ActorSystem, Props}
 import akka.io.IO
 import rest.RoutedHttpService
-import actors.{CiccioAkaResultsManager, QuizMessages, JulioAkaAnswerManager}
+import actors.{CiccioAkaResultsManager, QuizMessages, JulioAkaAnswerProvider}
 import com.typesafe.config.ConfigFactory
 import spray.can.Http
 

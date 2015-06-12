@@ -3,7 +3,7 @@ package actors
 import actors.QuizMessages.{Answer, PullQuestion, Question}
 import akka.actor._
 
-class JulioAkaAnswerManager(participantName: String) extends Actor with ActorLogging {
+class JulioAkaAnswerProvider(participantName: String) extends Actor with ActorLogging {
 
   var question: Question = null
 
