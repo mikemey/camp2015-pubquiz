@@ -1,7 +1,7 @@
 package rest
 
 import akka.actor.{Actor, ActorContext, Props}
-import actors.{Ciccio, ClusterBroadcaster, Julio}
+import actors.{Startup, Ciccio, ClusterBroadcaster, Julio}
 import com.typesafe.config.ConfigFactory
 import spray.routing._
 
@@ -13,6 +13,7 @@ class RoutedHttpService extends Actor with HttpService {
   val clusterBroadcaster = context.system.actorOf(Props[ClusterBroadcaster], "clusterBroadcaster")
   val ciccio = context.system.actorOf(Props[Ciccio], "ciccio")
   val julio = context.system.actorOf(Props(classOf[Julio], participantName), "julio")
+  val startup = context.system.actorOf(Props(classOf[Startup]), "startup")
 
   ciccio ! "System is started! Tell Julio!"
 

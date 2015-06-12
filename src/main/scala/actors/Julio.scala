@@ -22,6 +22,7 @@ class Julio(participantName: String) extends Actor with ActorLogging {
     case "Lavate JULIO!" =>
       log.info(s"Participant name is $participantName")
       log.info("Tengo que lavarme tio! Hoy no, manana!")
+      context.actorSelection("/user/startup") ! "Start!"
 
     case _ =>
       log.warning("Julio - Unknown message")
