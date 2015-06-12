@@ -3,7 +3,7 @@ package actors
 import actors.QuizMessages._
 import akka.actor.{Actor, ActorLogging}
 
-class Ciccio extends Actor with ActorLogging {
+class CiccioAkaResultsManager extends Actor with ActorLogging {
 
   var results: Option[Results] = None
   var counters =  collection.mutable.Map[String, Int]()
