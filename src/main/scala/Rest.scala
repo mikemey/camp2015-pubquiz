@@ -1,8 +1,9 @@
+import java.net._
+
 import akka.actor.{ActorSystem, Props}
 import akka.io.IO
-import rest.RoutedHttpService
-import actors.{CiccioAkaResultsManager, QuizMessages, JulioAkaAnswerProvider}
 import com.typesafe.config.ConfigFactory
+import rest.RoutedHttpService
 import spray.can.Http
 
 object Rest extends App {
@@ -11,7 +12,7 @@ object Rest extends App {
 
   val rootService = system.actorOf(Props(new RoutedHttpService()))
 
-  IO(Http)(system) ! Http.Bind(rootService, "0.0.0.0", port = 8080)
+  IO(Http)(system) ! Http.Bind(rootService, InetAddress.getLocalHost.getHostAddress, port = 8080)
 
   sys.addShutdownHook(system.terminate())
 }
